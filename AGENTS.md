@@ -13,3 +13,4 @@
 - Download passwords are stored only as SHA-256 hashes and redeemed by an atomic UPDATE (unused + not expired) in a public server fn using the admin client — guarantees single use.
 - Shared password rules (TTL, format, status) live in src/lib/codes.ts and are covered by src/lib/codes.test.ts.
 - Files live in the private `files` bucket under `<owner_id>/...`; visitors only get short-lived signed URLs.
+- Use the shared BrandLogo component for site branding so all screens reference the same uploaded asset; derive the favicon from that asset's symbol.

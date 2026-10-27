@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Download, KeyRound, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
 
 export const Route = createFileRoute("/")({
@@ -54,8 +55,8 @@ function Index() {
 
   return (
     <main className="grid-paper flex min-h-screen flex-col">
-      <header className="flex items-center justify-between px-6 py-5">
-        <span className="font-mono text-sm font-bold tracking-widest">VCAMPRO INSTALLER</span>
+      <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <BrandLogo className="h-20 w-32 shrink-0 sm:h-24 sm:w-36" />
         <Link to="/painel" className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
           Área do dono →
         </Link>

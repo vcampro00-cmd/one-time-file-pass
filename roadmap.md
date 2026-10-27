@@ -1,3 +1,4 @@
 # Roadmap
 
-- [ ] Apply the VCAMPRO INSTALLER logo when the owner sends it: favicon in `public/` + `<link rel="icon">` in `src/routes/__root.tsx`, and match `--accent` in `src/styles.css` to the logo color. Blocked on: the logo file.
+- [x] Apply the owner's VCAMPRO INSTALLER logo on the site and favicon, and match the accent to its cyan color.
+- [x] Restore dependency downloads and verify the logo on the home and login pages, including the mobile header and favicon.
