@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      code_purchases: {
+        Row: {
+          code: string
+          code_id: string
+          created_at: string
+          environment: string
+          expires_at: string
+          session_id: string
+        }
+        Insert: {
+          code: string
+          code_id: string
+          created_at?: string
+          environment: string
+          expires_at: string
+          session_id: string
+        }
+        Update: {
+          code?: string
+          code_id?: string
+          created_at?: string
+          environment?: string
+          expires_at?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       files: {
         Row: {
           created_at: string
