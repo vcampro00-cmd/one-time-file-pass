@@ -7,6 +7,7 @@ import { Copy, KeyRound, LogOut, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
 import { createAccessCode } from "@/lib/codes.functions";
 import { codeStatus, formatCode } from "@/lib/codes";
@@ -121,8 +122,11 @@ function Painel() {
 
   return (
     <main className="grid-paper min-h-screen">
-      <header className="flex items-center justify-between px-6 py-5">
-        <span className="font-mono text-sm font-bold tracking-widest">VCAMPRO INSTALLER / PAINEL</span>
+      <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-3">
+          <BrandLogo className="h-20 w-32 shrink-0 sm:h-24 sm:w-36" />
+          <span className="font-mono text-xs font-bold">PAINEL</span>
+        </div>
         <Button variant="ghost" size="sm" onClick={signOut}>
           <LogOut /> Sair
         </Button>

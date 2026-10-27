@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -51,7 +52,7 @@ function AuthPage() {
   return (
     <main className="grid-paper flex min-h-screen items-center justify-center px-4">
       <form onSubmit={submit} className="panel w-full max-w-sm space-y-5 p-8">
-        <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground">VCAMPRO INSTALLER</p>
+        <BrandLogo className="mx-auto h-36 w-56 max-w-full" />
         <h1 className="text-2xl font-bold">{mode === "in" ? "Entrar" : "Criar conta"}</h1>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
