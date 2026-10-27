@@ -34,6 +34,7 @@ function Retour() {
 
   useEffect(() => {
     if (!session_id) return setRes({ error: "Aucun achat trouvé." });
+    savePurchase(session_id);
     claim({ data: { sessionId: session_id, environment: getStripeEnvironment() } })
       .then(setRes)
       .catch(() => setRes({ error: "Impossible de récupérer votre code." }));
