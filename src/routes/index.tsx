@@ -10,10 +10,10 @@ import { redeemAccessCode } from "@/lib/codes.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VCAMPRO INSTALLER — Baixe arquivos com senha" },
-      { name: "description", content: "Digite sua senha de uso único para baixar os arquivos compartilhados com você." },
-      { property: "og:title", content: "VCAMPRO INSTALLER — Baixe arquivos com senha" },
-      { property: "og:description", content: "Senhas de uso único que expiram em 10 minutos." },
+      { title: "VCAMPRO INSTALLER — Téléchargez vos fichiers avec un code" },
+      { name: "description", content: "Saisissez votre code à usage unique pour télécharger les fichiers partagés avec vous." },
+      { property: "og:title", content: "VCAMPRO INSTALLER — Téléchargez vos fichiers avec un code" },
+      { property: "og:description", content: "Codes à usage unique valables pendant 10 minutes." },
       { property: "og:site_name", content: "VCAMPRO INSTALLER" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -23,10 +23,10 @@ export const Route = createFileRoute("/")({
 });
 
 function formatSize(n: number) {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 ** 2) return `${(n / 1024).toFixed(1)} KB`;
-  if (n < 1024 ** 3) return `${(n / 1024 ** 2).toFixed(1)} MB`;
-  return `${(n / 1024 ** 3).toFixed(2)} GB`;
+  if (n < 1024) return `${n} o`;
+  if (n < 1024 ** 2) return `${(n / 1024).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Ko`;
+  if (n < 1024 ** 3) return `${(n / 1024 ** 2).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo`;
+  return `${(n / 1024 ** 3).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} Go`;
 }
 
 type FileLink = { id: string; name: string; size: number; url: string };
@@ -44,10 +44,10 @@ function Index() {
     setError(null);
     try {
       const res = await redeem({ data: { code } });
-      if (!res.ok) setError("Senha inválida, já usada ou expirada.");
+      if (!res.ok) setError("Code invalide, déjà utilisé ou expiré.");
       else setFiles(res.files);
     } catch {
-      setError("Senha inválida, já usada ou expirada.");
+      setError("Code invalide, déjà utilisé ou expiré.");
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ function Index() {
       <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <BrandLogo className="h-20 w-32 shrink-0 sm:h-24 sm:w-36" />
         <Link to="/painel" className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
-          Área do dono →
+          Espace propriétaire →
         </Link>
       </header>
 
@@ -68,9 +68,9 @@ function Index() {
             <form onSubmit={submit} className="space-y-6">
               <div className="space-y-2">
                 <KeyRound className="h-8 w-8 text-accent" />
-                <h1 className="text-3xl font-bold tracking-tight">Digite sua senha</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Saisissez votre code</h1>
                 <p className="text-sm text-muted-foreground">
-                  Cada senha funciona uma única vez e expira em 10 minutos.
+                  Chaque code ne peut être utilisé qu’une seule fois et expire après 10 minutes.
                 </p>
               </div>
               <Input
@@ -83,15 +83,15 @@ function Index() {
               />
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
               <Button type="submit" size="lg" className="w-full" disabled={loading || code.length < 8}>
-                {loading ? <Loader2 className="animate-spin" /> : "Desbloquear"}
+                {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
               </Button>
             </form>
           ) : (
             <div className="space-y-5">
               <div>
-                <h1 className="text-2xl font-bold">Arquivos liberados</h1>
+                <h1 className="text-2xl font-bold">Fichiers disponibles</h1>
                 <p className="text-sm text-muted-foreground">
-                  A senha já foi consumida. Baixe agora — os links valem por 10 minutos.
+                  Le code a été utilisé. Téléchargez maintenant : les liens sont valables pendant 10 minutes.
                 </p>
               </div>
               <ul className="divide-y divide-border border-y border-border">
@@ -103,12 +103,12 @@ function Index() {
                     </div>
                     <Button asChild size="sm" variant="outline">
                       <a href={f.url} download={f.name}>
-                        <Download /> Baixar
+                        <Download /> Télécharger
                       </a>
                     </Button>
                   </li>
                 ))}
-                {files.length === 0 && <li className="py-3 text-sm text-muted-foreground">Nenhum arquivo disponível.</li>}
+                {files.length === 0 && <li className="py-3 text-sm text-muted-foreground">Aucun fichier disponible.</li>}
               </ul>
             </div>
           )}

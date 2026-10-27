@@ -15,10 +15,10 @@ import { codeStatus, formatCode } from "@/lib/codes";
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
     meta: [
-      { title: "Painel — VCAMPRO INSTALLER" },
-      { name: "description", content: "Envie arquivos e gere senhas de uso único." },
-      { property: "og:title", content: "Painel — VCAMPRO INSTALLER" },
-      { property: "og:description", content: "Envie arquivos e gere senhas de uso único." },
+      { title: "Tableau de bord — VCAMPRO INSTALLER" },
+      { name: "description", content: "Importez des fichiers et générez des codes à usage unique." },
+      { property: "og:title", content: "Tableau de bord — VCAMPRO INSTALLER" },
+      { property: "og:description", content: "Importez des fichiers et générez des codes à usage unique." },
       { property: "og:site_name", content: "VCAMPRO INSTALLER" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -76,7 +76,7 @@ function Painel() {
       const path = `${u.user!.id}/${crypto.randomUUID()}-${file.name}`;
       const { error } = await supabase.storage.from("files").upload(path, file);
       if (error) {
-        toast.error(`Falha ao enviar ${file.name}`);
+        toast.error(`Échec de l’import de ${file.name}`);
         continue;
       }
       await supabase.from("files").insert({ name: file.name, storage_path: path, size: file.size });
@@ -84,7 +84,7 @@ function Painel() {
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
     qc.invalidateQueries({ queryKey: ["files"] });
-    toast.success("Arquivos enviados");
+    toast.success("Fichiers importés");
   }
 
   async function remove(id: string, path: string) {
@@ -101,7 +101,7 @@ function Painel() {
       setLatest(res);
       qc.invalidateQueries({ queryKey: ["codes"] });
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error("Impossible de générer le code. Vérifiez les fichiers sélectionnés et réessayez.");
     }
   }
 
@@ -123,22 +123,22 @@ function Painel() {
   return (
     <main className="grid-paper min-h-screen">
       <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <BrandLogo className="h-20 w-32 shrink-0 sm:h-24 sm:w-36" />
-          <span className="font-mono text-xs font-bold">PAINEL</span>
+          <span className="font-mono text-xs font-bold break-words">TABLEAU DE BORD</span>
         </div>
         <Button variant="ghost" size="sm" onClick={signOut}>
-          <LogOut /> Sair
+          <LogOut /> Déconnexion
         </Button>
       </header>
 
       <div className="mx-auto grid max-w-5xl gap-6 px-4 pb-16 lg:grid-cols-[1.4fr_1fr]">
         <section className="panel p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold">Arquivos</h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-bold">Fichiers</h2>
             <input ref={inputRef} type="file" multiple hidden onChange={(e) => upload(e.target.files)} />
             <Button onClick={() => inputRef.current?.click()} disabled={uploading}>
-              <Upload /> {uploading ? "Enviando..." : "Enviar arquivos"}
+              <Upload /> {uploading ? "Importation..." : "Importer des fichiers"}
             </Button>
           </div>
           <ul className="divide-y divide-border border-y border-border">
@@ -146,32 +146,32 @@ function Painel() {
               <li key={f.id} className="flex items-center gap-3 py-3">
                 <Checkbox checked={selected.has(f.id)} onCheckedChange={() => toggle(f.id)} />
                 <span className="min-w-0 flex-1 truncate">{f.name}</span>
-                <span className="font-mono text-xs text-muted-foreground">{(f.size / 1024 / 1024).toFixed(1)} MB</span>
-                <Button size="icon" variant="ghost" onClick={() => remove(f.id, f.storage_path)} aria-label="Excluir">
+                <span className="font-mono text-xs text-muted-foreground">{(f.size / 1024 / 1024).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo</span>
+                <Button size="icon" variant="ghost" onClick={() => remove(f.id, f.storage_path)} aria-label="Supprimer">
                   <Trash2 />
                 </Button>
               </li>
             ))}
-            {files.data?.length === 0 && <li className="py-6 text-center text-sm text-muted-foreground">Nenhum arquivo ainda.</li>}
+            {files.data?.length === 0 && <li className="py-6 text-center text-sm text-muted-foreground">Aucun fichier pour le moment.</li>}
           </ul>
         </section>
 
         <section className="space-y-6">
           <div className="panel p-6">
-            <h2 className="mb-1 text-xl font-bold">Gerar senha</h2>
+            <h2 className="mb-1 text-xl font-bold">Générer un code</h2>
             <p className="mb-4 text-sm text-muted-foreground">
-              {selected.size} arquivo(s) selecionado(s). Vale 1 vez, por 10 minutos.
+              {selected.size} fichier(s) sélectionné(s). Usage unique, valable 10 minutes.
             </p>
             <Button className="w-full" variant="secondary" disabled={selected.size === 0} onClick={generate}>
-              <KeyRound /> Gerar senha
+              <KeyRound /> Générer un code
             </Button>
             {latest && (
               <div className="mt-5 border-2 border-dashed border-accent p-4 text-center">
                 <p className="font-mono text-3xl font-bold tracking-[0.2em]">{formatCode(latest.code)}</p>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
                   {remaining > 0
-                    ? `expira em ${Math.floor(remaining / 60000)}:${String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0")}`
-                    : "expirada"}
+                    ? `expire dans ${Math.floor(remaining / 60000)}:${String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0")}`
+                    : "expiré"}
                 </p>
                 <Button
                   size="sm"
@@ -179,31 +179,31 @@ function Painel() {
                   className="mt-2"
                   onClick={() => {
                     navigator.clipboard.writeText(formatCode(latest.code));
-                    toast.success("Senha copiada");
+                    toast.success("Code copié");
                   }}
                 >
-                  <Copy /> Copiar
+                  <Copy /> Copier
                 </Button>
               </div>
             )}
           </div>
 
           <div className="panel p-6">
-            <h2 className="mb-3 text-lg font-bold">Senhas recentes</h2>
+            <h2 className="mb-3 text-lg font-bold">Codes récents</h2>
             <ul className="space-y-2 text-sm">
               {codes.data?.map((c) => {
                 const st = codeStatus(c, now);
                 const count = (c.access_code_files as unknown as { count: number }[])[0]?.count ?? 0;
                 return (
-                  <li key={c.id} className="flex items-center justify-between">
+                  <li key={c.id} className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-mono text-xs text-muted-foreground">
-                      {new Date(c.created_at).toLocaleString("pt-BR")} · {count} arq.
+                      {new Date(c.created_at).toLocaleString("fr-FR")} · {count} fich.
                     </span>
-                    <Badge variant={st === "ativa" ? "default" : "outline"}>{st}</Badge>
+                    <Badge variant={st === "ativa" ? "default" : "outline"}>{st === "ativa" ? "actif" : st === "usada" ? "utilisé" : "expiré"}</Badge>
                   </li>
                 );
               })}
-              {codes.data?.length === 0 && <li className="text-muted-foreground">Nenhuma senha gerada.</li>}
+              {codes.data?.length === 0 && <li className="text-muted-foreground">Aucun code généré.</li>}
             </ul>
           </div>
         </section>

@@ -10,10 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — VCAMPRO INSTALLER" },
-      { name: "description", content: "Acesso do dono para enviar arquivos e gerar senhas." },
-      { property: "og:title", content: "Entrar — VCAMPRO INSTALLER" },
-      { property: "og:description", content: "Acesso do dono do VCAMPRO INSTALLER." },
+      { title: "Connexion — VCAMPRO INSTALLER" },
+      { name: "description", content: "Accès propriétaire pour importer des fichiers et générer des codes à usage unique." },
+      { property: "og:title", content: "Connexion — VCAMPRO INSTALLER" },
+      { property: "og:description", content: "Espace propriétaire de VCAMPRO INSTALLER." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -34,7 +34,7 @@ function AuthPage() {
     if (mode === "in") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
-      if (error) { toast.error("E-mail ou senha incorretos"); return; }
+      if (error) { toast.error("Adresse e-mail ou mot de passe incorrect"); return; }
       navigate({ to: "/painel" });
     } else {
       const { error } = await supabase.auth.signUp({
@@ -43,8 +43,8 @@ function AuthPage() {
         options: { emailRedirectTo: window.location.origin + "/painel" },
       });
       setLoading(false);
-      if (error) { toast.error(error.message); return; }
-      toast.success("Conta criada! Confirme pelo link enviado ao seu e-mail.");
+      if (error) { toast.error("Impossible de créer le compte. Vérifiez vos informations et réessayez."); return; }
+      toast.success("Compte créé ! Confirmez votre adresse avec le lien reçu par e-mail.");
       setMode("in");
     }
   }
@@ -53,24 +53,24 @@ function AuthPage() {
     <main className="grid-paper flex min-h-screen items-center justify-center px-4">
       <form onSubmit={submit} className="panel w-full max-w-sm space-y-5 p-8">
         <BrandLogo className="mx-auto h-36 w-56 max-w-full" />
-        <h1 className="text-2xl font-bold">{mode === "in" ? "Entrar" : "Criar conta"}</h1>
+        <h1 className="text-2xl font-bold">{mode === "in" ? "Se connecter" : "Créer un compte"}</h1>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="pw">Senha</Label>
+          <Label htmlFor="pw">Mot de passe</Label>
           <Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
-          {mode === "in" ? "Entrar" : "Criar conta"}
+          {mode === "in" ? "Se connecter" : "Créer un compte"}
         </Button>
         <button
           type="button"
           onClick={() => setMode(mode === "in" ? "up" : "in")}
           className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
         >
-          {mode === "in" ? "Primeira vez? Criar conta" : "Já tenho conta"}
+          {mode === "in" ? "Première visite ? Créer un compte" : "J’ai déjà un compte"}
         </button>
       </form>
     </main>
