@@ -12,7 +12,7 @@ function checkEnv(env: unknown): StripeEnv {
 
 // Public: anyone can start buying a 10-minute code.
 export const createCodeCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { returnUrl: string; environment: StripeEnv }) => ({
+  .validator((d: { returnUrl: string; environment: StripeEnv }) => ({
     returnUrl: String(d.returnUrl),
     environment: checkEnv(d.environment),
   }))
@@ -42,7 +42,7 @@ export const createCodeCheckout = createServerFn({ method: "POST" })
 
 // Public: after payment, returns the code for a paid session (created once, same code on reload).
 export const claimPurchasedCode = createServerFn({ method: "POST" })
-  .inputValidator((d: { sessionId: string; environment: StripeEnv }) => {
+  .validator((d: { sessionId: string; environment: StripeEnv }) => {
     const sessionId = String(d.sessionId);
     if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new Error("Session invalide");
     return { sessionId, environment: checkEnv(d.environment) };
@@ -98,7 +98,7 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
 
 // Public: shows a purchased code again, only while it can still be redeemed.
 export const revealPurchasedCode = createServerFn({ method: "POST" })
-  .inputValidator((d: { sessionId: string }) => {
+  .validator((d: { sessionId: string }) => {
     const sessionId = String(d.sessionId);
     if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new Error("Session invalide");
     return { sessionId };

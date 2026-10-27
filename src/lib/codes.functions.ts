@@ -14,7 +14,7 @@ type FileLink = { id: string; name: string; size: number; url: string };
 
 export const createAccessCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { fileIds: string[] }) => {
+  .validator((input: { fileIds: string[] }) => {
     if (!Array.isArray(input.fileIds) || input.fileIds.length === 0 || input.fileIds.length > 200)
       throw new Error("Sélectionnez au moins un fichier");
     return { fileIds: input.fileIds.map(String) };
@@ -47,7 +47,7 @@ export const createAccessCode = createServerFn({ method: "POST" })
 
 // Public: a visitor redeems a password once.
 export const redeemAccessCode = createServerFn({ method: "POST" })
-  .inputValidator((input: { code: string }) => {
+  .validator((input: { code: string }) => {
     const code = normalizeCode(String(input?.code ?? ""));
     if (code.length !== CODE_LENGTH && !isMasterCode(code)) throw new Error("Code invalide");
     return { code };
