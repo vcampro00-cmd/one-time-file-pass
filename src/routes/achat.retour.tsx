@@ -10,7 +10,7 @@ import { formatCode } from "@/lib/codes";
 
 export const Route = createFileRoute("/achat/retour")({
   validateSearch: (s: Record<string, unknown>): { session_id?: string } => ({
-    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
+    session_id: typeof s["session_id"] === "string" ? s["session_id"] : undefined,
   }),
   head: () => ({
     meta: [
