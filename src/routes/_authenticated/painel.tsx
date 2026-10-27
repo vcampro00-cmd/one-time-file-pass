@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_authenticated/painel")({
       { property: "og:title", content: "Painel — VCAMPRO INSTALLER" },
       { property: "og:description", content: "Envie arquivos e gere senhas de uso único." },
       { property: "og:site_name", content: "VCAMPRO INSTALLER" },
+      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
@@ -121,7 +122,7 @@ function Painel() {
   return (
     <main className="grid-paper min-h-screen">
       <header className="flex items-center justify-between px-6 py-5">
-        <span className="font-mono text-sm font-bold tracking-widest">COFRE/ PAINEL</span>
+        <span className="font-mono text-sm font-bold tracking-widest">VCAMPRO INSTALLER / PAINEL</span>
         <Button variant="ghost" size="sm" onClick={signOut}>
           <LogOut /> Sair
         </Button>
