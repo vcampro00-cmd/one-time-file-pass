@@ -26,7 +26,7 @@ function Checkout() {
 
 export function BuyCode() {
   const [open, setOpen] = useState(false);
-  const isTest = (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith("pk_test_");
+  const isTest = (import.meta.env["VITE_PAYMENTS_CLIENT_TOKEN"] as string | undefined)?.startsWith("pk_test_");
   return (
     <div className="space-y-2 border-t border-border pt-6">
       <p className="text-center text-sm text-muted-foreground">Pas de code ?</p>

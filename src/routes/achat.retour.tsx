@@ -9,7 +9,7 @@ import { getStripeEnvironment } from "@/lib/stripe";
 import { formatCode } from "@/lib/codes";
 
 export const Route = createFileRoute("/achat/retour")({
-  validateSearch: (s: Record<string, unknown>): { session_id?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { session_id?: string | undefined } => ({
     session_id: typeof s["session_id"] === "string" ? s["session_id"] : undefined,
   }),
   head: () => ({

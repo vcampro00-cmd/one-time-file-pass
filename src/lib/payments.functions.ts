@@ -71,7 +71,7 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
     const expiresAt = expiresAtFrom(new Date()).toISOString();
     const { data: row, error } = await supabaseAdmin
       .from("access_codes")
-      .insert({ owner_id: files[0].owner_id, code_hash: await hashCode(code), expires_at: expiresAt })
+      .insert({ owner_id: files[0]!.owner_id, code_hash: await hashCode(code), expires_at: expiresAt })
       .select("id")
       .single();
     if (error) return { error: "Erreur lors de la création du code." };
