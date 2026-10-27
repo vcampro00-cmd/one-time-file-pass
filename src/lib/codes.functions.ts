@@ -6,7 +6,7 @@ export const createAccessCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { fileIds: string[] }) => {
     if (!Array.isArray(input.fileIds) || input.fileIds.length === 0 || input.fileIds.length > 200)
-      throw new Error("Selecione ao menos um arquivo");
+      throw new Error("Sélectionnez au moins un fichier");
     return { fileIds: input.fileIds.map(String) };
   })
   .handler(async ({ data, context }) => {
@@ -16,7 +16,7 @@ export const createAccessCode = createServerFn({ method: "POST" })
       .select("id")
       .in("id", data.fileIds);
     if (fe) throw new Error(fe.message);
-    if (!owned || owned.length !== data.fileIds.length) throw new Error("Arquivo inválido");
+    if (!owned || owned.length !== data.fileIds.length) throw new Error("Fichier invalide");
 
     const code = generateCode();
     const expiresAt = expiresAtFrom(new Date());
@@ -39,7 +39,7 @@ export const createAccessCode = createServerFn({ method: "POST" })
 export const redeemAccessCode = createServerFn({ method: "POST" })
   .inputValidator((input: { code: string }) => {
     const code = normalizeCode(String(input?.code ?? ""));
-    if (code.length !== CODE_LENGTH) throw new Error("Senha inválida");
+    if (code.length !== CODE_LENGTH) throw new Error("Code invalide");
     return { code };
   })
   .handler(async ({ data }) => {
@@ -56,7 +56,7 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       .gt("expires_at", nowIso)
       .select("id")
       .maybeSingle();
-    if (error) throw new Error("Erro ao verificar senha");
+    if (error) throw new Error("Erreur lors de la vérification du code");
     if (!claimed) return { ok: false as const, files: [] };
 
     const { data: links } = await supabaseAdmin
