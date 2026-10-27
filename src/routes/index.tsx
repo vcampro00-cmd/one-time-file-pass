@@ -89,6 +89,7 @@ function Index() {
                 {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
               </Button>
               <BuyCode />
+              <RecoverCode />
             </form>
           ) : (
             <div className="space-y-5">
