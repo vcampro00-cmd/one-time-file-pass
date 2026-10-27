@@ -27,6 +27,14 @@ describe("one-time passwords", () => {
     expect(codeStatus({ expires_at: past, used_at: null })).toBe("expirada");
   });
 
+  it("can be shown again only while unused and not expired", () => {
+    const now = new Date("2026-01-01T12:00:00Z");
+    const future = new Date(now.getTime() + 60_000).toISOString();
+    expect(canRevealCode({ expires_at: future, used_at: null }, now)).toBe(true);
+    expect(canRevealCode({ expires_at: future, used_at: now.toISOString() }, now)).toBe(false);
+    expect(canRevealCode({ expires_at: now.toISOString(), used_at: null }, now)).toBe(false);
+  });
+
   it("hash the same regardless of dash or case", async () => {
     const c = generateCode();
     expect(await hashCode(`${c.slice(0, 4).toLowerCase()}-${c.slice(4)}`)).toBe(await hashCode(c));
