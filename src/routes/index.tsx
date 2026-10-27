@@ -9,10 +9,11 @@ import { redeemAccessCode } from "@/lib/codes.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Cofre — Baixe arquivos com senha" },
+      { title: "VCAMPRO INSTALLER — Baixe arquivos com senha" },
       { name: "description", content: "Digite sua senha de uso único para baixar os arquivos compartilhados com você." },
-      { property: "og:title", content: "Cofre — Baixe arquivos com senha" },
+      { property: "og:title", content: "VCAMPRO INSTALLER — Baixe arquivos com senha" },
       { property: "og:description", content: "Senhas de uso único que expiram em 10 minutos." },
+      { property: "og:site_name", content: "VCAMPRO INSTALLER" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,7 +55,7 @@ function Index() {
   return (
     <main className="grid-paper flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-5">
-        <span className="font-mono text-sm font-bold tracking-widest">COFRE/</span>
+        <span className="font-mono text-sm font-bold tracking-widest">VCAMPRO INSTALLER</span>
         <Link to="/painel" className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
           Área do dono →
         </Link>
