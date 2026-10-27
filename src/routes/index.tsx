@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
+import { isCodeComplete, maskCode } from "@/lib/codes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -75,14 +76,14 @@ function Index() {
               </div>
               <Input
                 value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                onChange={(e) => setCode(maskCode(e.target.value))}
                 placeholder="XXXX-XXXX"
                 autoFocus
                 maxLength={9}
                 className="h-14 text-center font-mono text-2xl tracking-[0.3em]"
               />
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-              <Button type="submit" size="lg" className="w-full" disabled={loading || code.length < 8}>
+              <Button type="submit" size="lg" className="w-full" disabled={loading || !isCodeComplete(code)}>
                 {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
               </Button>
             </form>
