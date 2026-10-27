@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { claimPurchasedCode } from "@/lib/payments.functions";
+import { savePurchase } from "@/lib/purchase-store";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { formatCode } from "@/lib/codes";
 
@@ -33,6 +34,7 @@ function Retour() {
 
   useEffect(() => {
     if (!session_id) return setRes({ error: "Aucun achat trouvé." });
+    savePurchase(session_id);
     claim({ data: { sessionId: session_id, environment: getStripeEnvironment() } })
       .then(setRes)
       .catch(() => setRes({ error: "Impossible de récupérer votre code." }));

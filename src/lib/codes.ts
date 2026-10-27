@@ -62,3 +62,8 @@ export function codeStatus(
   if (new Date(c.expires_at) <= now) return "expirada";
   return "ativa";
 }
+
+// A purchased code may be shown again only while it can still be redeemed.
+export function canRevealCode(c: { expires_at: string; used_at: string | null }, now = new Date()): boolean {
+  return codeStatus(c, now) === "ativa";
+}

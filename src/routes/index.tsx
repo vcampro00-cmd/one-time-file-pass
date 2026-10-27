@@ -8,6 +8,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
 import { isCodeComplete, maskCode } from "@/lib/codes";
 import { BuyCode } from "@/components/buy-code";
+import { RecoverCode } from "@/components/recover-code";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -88,6 +89,7 @@ function Index() {
                 {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
               </Button>
               <BuyCode />
+              <RecoverCode />
             </form>
           ) : (
             <div className="space-y-5">

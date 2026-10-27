@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { expiresAtFrom, generateCode, hashCode } from "./codes";
+import { canRevealCode, expiresAtFrom, generateCode, hashCode } from "./codes";
 
 export const CODE_PRICE_ID = "access_code_10min_eur";
 
@@ -12,7 +12,7 @@ function checkEnv(env: unknown): StripeEnv {
 
 // Public: anyone can start buying a 10-minute code.
 export const createCodeCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { returnUrl: string; environment: StripeEnv }) => ({
+  .validator((d: { returnUrl: string; environment: StripeEnv }) => ({
     returnUrl: String(d.returnUrl),
     environment: checkEnv(d.environment),
   }))
@@ -42,7 +42,7 @@ export const createCodeCheckout = createServerFn({ method: "POST" })
 
 // Public: after payment, returns the code for a paid session (created once, same code on reload).
 export const claimPurchasedCode = createServerFn({ method: "POST" })
-  .inputValidator((d: { sessionId: string; environment: StripeEnv }) => {
+  .validator((d: { sessionId: string; environment: StripeEnv }) => {
     const sessionId = String(d.sessionId);
     if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new Error("Session invalide");
     return { sessionId, environment: checkEnv(d.environment) };
@@ -94,4 +94,30 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
       .from("access_code_files")
       .insert(files.map((f) => ({ code_id: row.id, file_id: f.id })));
     return { code, expiresAt };
+  });
+
+// Public: shows a purchased code again, only while it can still be redeemed.
+export const revealPurchasedCode = createServerFn({ method: "POST" })
+  .validator((d: { sessionId: string }) => {
+    const sessionId = String(d.sessionId);
+    if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new Error("Session invalide");
+    return { sessionId };
+  })
+  .handler(async ({ data }): Promise<{ code: string; expiresAt: string } | { error: string }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: purchase } = await supabaseAdmin
+      .from("code_purchases")
+      .select("code, expires_at, code_id")
+      .eq("session_id", data.sessionId)
+      .maybeSingle();
+    if (!purchase) return { error: "Aucun achat trouvé dans ce navigateur." };
+
+    const { data: row } = await supabaseAdmin
+      .from("access_codes")
+      .select("used_at, expires_at")
+      .eq("id", purchase.code_id)
+      .maybeSingle();
+    if (!row || !canRevealCode(row)) return { error: "Ce code n’est plus valide." };
+
+    return { code: purchase.code, expiresAt: purchase.expires_at };
   });
