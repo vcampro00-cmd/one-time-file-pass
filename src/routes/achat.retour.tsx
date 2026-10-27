@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { claimPurchasedCode } from "@/lib/payments.functions";
+import { savePurchase } from "@/lib/purchase-store";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { formatCode } from "@/lib/codes";
 
