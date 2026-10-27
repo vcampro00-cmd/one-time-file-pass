@@ -51,6 +51,7 @@ function AuthPage() {
   return (
     <main className="grid-paper flex min-h-screen items-center justify-center px-4">
       <form onSubmit={submit} className="panel w-full max-w-sm space-y-5 p-8">
+        <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground">VCAMPRO INSTALLER</p>
         <h1 className="text-2xl font-bold">{mode === "in" ? "Entrar" : "Criar conta"}</h1>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
