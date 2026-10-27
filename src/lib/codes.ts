@@ -44,6 +44,12 @@ export function maskCode(input: string): string {
   return chars.length > 4 ? `${chars.slice(0, 4)}-${chars.slice(4)}` : chars;
 }
 
+export async function hashCode(code: string): Promise<string> {
+  const data = new TextEncoder().encode(normalizeCode(code));
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export function expiresAtFrom(now: Date): Date {
   return new Date(now.getTime() + CODE_TTL_MINUTES * 60_000);
 }
