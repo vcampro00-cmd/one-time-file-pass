@@ -14,11 +14,11 @@ import { codeStatus, formatCode } from "@/lib/codes";
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
     meta: [
-      { title: "Painel — Cofre" },
+      { title: "Painel — VCAMPRO INSTALLER" },
       { name: "description", content: "Envie arquivos e gere senhas de uso único." },
-      { property: "og:title", content: "Painel — Cofre" },
+      { property: "og:title", content: "Painel — VCAMPRO INSTALLER" },
       { property: "og:description", content: "Envie arquivos e gere senhas de uso único." },
-      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "VCAMPRO INSTALLER" },
       { name: "twitter:card", content: "summary" },
     ],
   }),

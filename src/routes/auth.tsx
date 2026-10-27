@@ -9,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Cofre" },
+      { title: "Entrar — VCAMPRO INSTALLER" },
       { name: "description", content: "Acesso do dono para enviar arquivos e gerar senhas." },
-      { property: "og:title", content: "Entrar — Cofre" },
-      { property: "og:description", content: "Acesso do dono do Cofre." },
+      { property: "og:title", content: "Entrar — VCAMPRO INSTALLER" },
+      { property: "og:description", content: "Acesso do dono do VCAMPRO INSTALLER." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
