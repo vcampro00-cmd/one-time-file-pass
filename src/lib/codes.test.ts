@@ -42,14 +42,15 @@ describe("one-time passwords", () => {
 });
 
 describe("owner test code", () => {
-  it("is 170-214 and works with or without the dash", () => {
-    expect(isMasterCode("170-214")).toBe(true);
-    expect(isMasterCode("170214")).toBe(true);
-    expect(isMasterCode("170-215")).toBe(false);
+  it("recognizes the replacement master code with or without the dash", () => {
+    expect(isMasterCode("1702-1417")).toBe(true);
+    expect(isMasterCode("17021417")).toBe(true);
+    expect(isMasterCode("170-214")).toBe(false);
+    expect(isMasterCode("1702-1418")).toBe(false);
   });
 
   it("is formatted with its own dash", () => {
-    expect(formatCode("170214")).toBe("170-214");
+    expect(formatCode("17021417")).toBe("1702-1417");
   });
 });
 
@@ -62,12 +63,13 @@ describe("typing the code", () => {
   });
 
   it("keeps the test code's own dash position", () => {
-    expect(maskCode("170-214")).toBe("170-214");
-    expect(maskCode("170-2")).toBe("170-2");
+    expect(maskCode("17021417")).toBe("1702-1417");
+    expect(maskCode("1702-1417")).toBe("1702-1417");
   });
 
-  it("accepts 6 and 8 characters, nothing shorter", () => {
-    expect(isCodeComplete("170-214")).toBe(true);
+  it("accepts eight characters and rejects the old six-character code", () => {
+    expect(isCodeComplete("1702-1417")).toBe(true);
+    expect(isCodeComplete("170-214")).toBe(false);
     expect(isCodeComplete("ABCD-1234")).toBe(true);
     expect(isCodeComplete("ABC-12")).toBe(false);
   });
