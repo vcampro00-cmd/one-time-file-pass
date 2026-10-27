@@ -65,13 +65,6 @@ function AuthPage() {
         <Button type="submit" className="w-full" disabled={loading}>
           {mode === "in" ? "Se connecter" : "Créer un compte"}
         </Button>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "in" ? "up" : "in")}
-          className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
-        >
-          {mode === "in" ? "Première visite ? Créer un compte" : "J’ai déjà un compte"}
-        </button>
       </form>
     </main>
   );
