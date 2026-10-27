@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Download passwords are stored only as SHA-256 hashes and redeemed by an atomic UPDATE (unused + not expired) in a public server fn using the admin client — guarantees single use.
+- Shared password rules (TTL, format, status) live in src/lib/codes.ts and are covered by src/lib/codes.test.ts.
+- Files live in the private `files` bucket under `<owner_id>/...`; visitors only get short-lived signed URLs.
