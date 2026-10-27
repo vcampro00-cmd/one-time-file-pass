@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
 import { isCodeComplete, maskCode } from "@/lib/codes";
+import { BuyCode } from "@/components/buy-code";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,6 +87,7 @@ function Index() {
               <Button type="submit" size="lg" className="w-full" disabled={loading || !isCodeComplete(code)}>
                 {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
               </Button>
+              <BuyCode />
             </form>
           ) : (
             <div className="space-y-5">
