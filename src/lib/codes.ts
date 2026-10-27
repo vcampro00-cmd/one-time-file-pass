@@ -3,8 +3,8 @@ export const CODE_TTL_MINUTES = 10;
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
 export const CODE_LENGTH = 8;
 
-// Owner's personal test code: permanent, never consumed (typed 170-214).
-export const MASTER_CODE = "170214";
+// Owner's master code: permanent, never consumed.
+export const MASTER_CODE = "17021417";
 
 export function generateCode(): string {
   const bytes = new Uint8Array(CODE_LENGTH);
@@ -28,7 +28,6 @@ export function isCodeComplete(input: string): boolean {
 export function formatCode(code: string): string {
   const c = normalizeCode(code);
   if (c.length === CODE_LENGTH) return `${c.slice(0, 4)}-${c.slice(4)}`;
-  if (c.length === MASTER_CODE.length) return `${c.slice(0, 3)}-${c.slice(3)}`;
   return c;
 }
 
