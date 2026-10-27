@@ -1,6 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { expiresAtFrom, generateCode, hashCode, normalizeCode, CODE_LENGTH } from "./codes";
+import {
+  CODE_LENGTH,
+  expiresAtFrom,
+  generateCode,
+  hashCode,
+  isMasterCode,
+  normalizeCode,
+} from "./codes";
+
+type StoredFile = { id: string; name: string; size: number; storage_path: string };
+type FileLink = { id: string; name: string; size: number; url: string };
 
 export const createAccessCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -39,11 +49,32 @@ export const createAccessCode = createServerFn({ method: "POST" })
 export const redeemAccessCode = createServerFn({ method: "POST" })
   .inputValidator((input: { code: string }) => {
     const code = normalizeCode(String(input?.code ?? ""));
-    if (code.length !== CODE_LENGTH) throw new Error("Code invalide");
+    if (code.length !== CODE_LENGTH && !isMasterCode(code)) throw new Error("Code invalide");
     return { code };
   })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    async function sign(rows: StoredFile[]): Promise<FileLink[]> {
+      const out: FileLink[] = [];
+      for (const f of rows) {
+        const { data: signed } = await supabaseAdmin.storage
+          .from("files")
+          .createSignedUrl(f.storage_path, 60 * 10, { download: f.name });
+        if (signed) out.push({ id: f.id, name: f.name, size: f.size, url: signed.signedUrl });
+      }
+      return out;
+    }
+
+    // Owner's permanent test code: unlocks every file, is never consumed.
+    if (isMasterCode(data.code)) {
+      const { data: rows } = await supabaseAdmin
+        .from("files")
+        .select("id, name, size, storage_path")
+        .order("created_at", { ascending: false });
+      return { ok: true as const, files: await sign(rows ?? []) };
+    }
+
     const hash = await hashCode(data.code);
     const nowIso = new Date().toISOString();
 
@@ -57,21 +88,17 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       .select("id")
       .maybeSingle();
     if (error) throw new Error("Erreur lors de la vérification du code");
-    if (!claimed) return { ok: false as const, files: [] };
+    if (!claimed) return { ok: false as const, files: [] as FileLink[] };
 
     const { data: links } = await supabaseAdmin
       .from("access_code_files")
       .select("files(id, name, size, storage_path)")
       .eq("code_id", claimed.id);
 
-    const files = [];
+    const rows: StoredFile[] = [];
     for (const l of links ?? []) {
-      const f = l.files as unknown as { id: string; name: string; size: number; storage_path: string } | null;
-      if (!f) continue;
-      const { data: signed } = await supabaseAdmin.storage
-        .from("files")
-        .createSignedUrl(f.storage_path, 60 * 10, { download: f.name });
-      if (signed) files.push({ id: f.id, name: f.name, size: f.size, url: signed.signedUrl });
+      const f = l.files as unknown as StoredFile | null;
+      if (f) rows.push(f);
     }
-    return { ok: true as const, files };
+    return { ok: true as const, files: await sign(rows) };
   });

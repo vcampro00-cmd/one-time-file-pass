@@ -4,3 +4,4 @@
 
 - [x] Apply the owner's VCAMPRO INSTALLER logo on the site and favicon, and match the accent to its cyan color.
 - [x] Restore dependency downloads and verify the logo on the home and login pages, including the mobile header and favicon.
+- [x] Add the owner's permanent test code 170-214 and make the middle dash appear automatically while typing; verify unlock, masking and rejection of a wrong code in the preview.
