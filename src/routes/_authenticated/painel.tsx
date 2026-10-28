@@ -193,7 +193,7 @@ function Painel() {
             )}
           </div>
 
-          <div className="panel p-6">
+          <div className="lock-card rounded-3xl p-6">
             <h2 className="mb-3 text-lg font-bold">Codes récents</h2>
             <ul className="space-y-2 text-sm">
               {codes.data?.map((c) => {
