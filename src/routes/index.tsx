@@ -8,6 +8,7 @@ import { redeemAccessCode } from "@/lib/codes.functions";
 import { isCodeComplete, maskCode } from "@/lib/codes";
 import { BuyCode } from "@/components/buy-code";
 import { RecoverCode } from "@/components/recover-code";
+import menuGuideImg from "@/assets/vcampro-menu-camera-fr.png";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
