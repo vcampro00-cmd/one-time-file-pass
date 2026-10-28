@@ -13,8 +13,10 @@ import { createAccessCode } from "@/lib/codes.functions";
 import { codeStatus, formatCode } from "@/lib/codes";
 
 export const Route = createFileRoute("/_authenticated/painel")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, follow" },
       { title: "Tableau de bord — VCAMPRO INSTALLER" },
       { name: "description", content: "Importez des fichiers et générez des codes à usage unique." },
       { property: "og:title", content: "Tableau de bord — VCAMPRO INSTALLER" },

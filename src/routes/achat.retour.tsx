@@ -10,11 +10,13 @@ import { getStripeEnvironment } from "@/lib/stripe";
 import { formatCode } from "@/lib/codes";
 
 export const Route = createFileRoute("/achat/retour")({
+  staticData: { sitemap: false },
   validateSearch: (s: Record<string, unknown>): { session_id?: string | undefined } => ({
     session_id: typeof s["session_id"] === "string" ? s["session_id"] : undefined,
   }),
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, follow" },
       { title: "Votre code — VCAMPRO INSTALLER" },
       { name: "description", content: "Votre code d’accès acheté, valable 10 minutes." },
       { property: "og:title", content: "Votre code — VCAMPRO INSTALLER" },

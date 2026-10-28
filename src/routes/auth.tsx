@@ -8,8 +8,10 @@ import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, follow" },
       { title: "Connexion — VCAMPRO INSTALLER" },
       { name: "description", content: "Accès propriétaire pour importer des fichiers et générer des codes à usage unique." },
       { property: "og:title", content: "Connexion — VCAMPRO INSTALLER" },
