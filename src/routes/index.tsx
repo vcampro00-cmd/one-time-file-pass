@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { Download, Loader2, ShieldCheck, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Download, ExternalLink, Loader2, ShieldCheck, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
@@ -34,6 +34,8 @@ function formatSize(n: number) {
 
 type FileLink = { id: string; name: string; size: number; url: string };
 
+const SESSION_KEY = "vcampro:session";
+
 function Index() {
   const redeem = useServerFn(redeemAccessCode);
   const [code, setCode] = useState("");
@@ -41,23 +43,79 @@ function Index() {
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<FileLink[] | null>(null);
   const [profileHref, setProfileHref] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  function endSession(message: string | null) {
+    sessionStorage.removeItem(SESSION_KEY);
+    setFiles(null);
+    setProfileHref(null);
+    setExpiresAt(null);
+    setCode("");
+    setError(message);
+  }
+
+  async function open(c: string, restoring = false) {
     setLoading(true);
     setError(null);
     try {
-      const res = await redeem({ data: { code } });
-      if (!res.ok) setError("Code invalide, déjà utilisé ou expiré.");
-      else {
+      const res = await redeem({ data: { code: c } });
+      if (!res.ok) {
+        if (restoring) sessionStorage.removeItem(SESSION_KEY);
+        setError(restoring ? "Session expirée. Le code n’est plus valide." : "Code invalide ou expiré.");
+      } else {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({ code: c, expiresAt: res.expiresAt }));
         setFiles(res.files);
         setProfileHref(res.profileUrl);
+        setExpiresAt(res.expiresAt);
+        setNow(Date.now());
       }
     } catch {
-      setError("Code invalide, déjà utilisé ou expiré.");
+      setError("Code invalide ou expiré.");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    await open(code);
+  }
+
+  // Keep the session across reloads until the code's 10 minutes are over.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw) as { code: string; expiresAt: string | null };
+      if (s.expiresAt && new Date(s.expiresAt).getTime() <= Date.now()) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return;
+      }
+      void open(s.code, true);
+    } catch {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!files) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [files]);
+
+  useEffect(() => {
+    if (files && expiresAt && now >= new Date(expiresAt).getTime()) {
+      endSession("Session expirée. Le code n’est plus valide.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [now, files, expiresAt]);
+
+  let left = "";
+  if (expiresAt) {
+    const s = Math.max(0, Math.floor((new Date(expiresAt).getTime() - now) / 1000));
+    left = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   }
 
   return (
@@ -128,7 +186,7 @@ function Index() {
                 <span aria-hidden className="wordmark-dash-right h-0.5 w-7 rounded-full" />
               </div>
               <p className="mt-4 text-xs text-muted-foreground">
-                Chaque code ne peut être utilisé qu’une seule fois et expire après 10 minutes.
+                Chaque code reste valable 10 minutes, puis expire définitivement.
               </p>
             </div>
 
@@ -138,14 +196,53 @@ function Index() {
             </div>
           </form>
         ) : (
-          <div className="panel w-full max-w-md p-8">
-            <div className="space-y-5">
-              <div>
-                <h1 className="text-2xl font-bold">Fichiers disponibles</h1>
-                <p className="text-sm text-muted-foreground">
-                  Le code a été utilisé. Téléchargez maintenant : les liens sont valables pendant 10 minutes.
-                </p>
-              </div>
+          <div className="w-full max-w-md space-y-4">
+            {left && (
+              <p className="text-center font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                Session active · temps restant <span className="text-accent">{left}</span>
+              </p>
+            )}
+
+            {/* Step 1: DNS profile, step by step */}
+            <div className="panel space-y-3 p-6">
+              <h2 className="text-lg font-bold">1. Profil DNS</h2>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                <li>Ouvrez cette page dans Safari sur votre iPhone.</li>
+                <li>Appuyez sur « Installer le profil DNS » puis sur « Autoriser ».</li>
+                <li>Ouvrez Réglages › Profil téléchargé › Installer.</li>
+              </ol>
+              {profileHref ? (
+                <a
+                  href={profileHref}
+                  className="btn-gradient flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110"
+                >
+                  <ShieldCheck className="h-4 w-4" /> Installer le profil DNS
+                </a>
+              ) : (
+                <p className="text-xs text-muted-foreground">Profil indisponible pour le moment.</p>
+              )}
+            </div>
+
+            {/* Step 2: link */}
+            <div className="panel space-y-3 p-6">
+              <h2 className="text-lg font-bold">2. Lien</h2>
+              <p className="text-sm text-muted-foreground">Appuyez sur le lien ci-dessous.</p>
+              <a
+                href="https://khoindvn.io.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 break-all rounded-full border border-border px-4 py-2.5 text-sm font-medium text-accent transition hover:bg-foreground/5"
+              >
+                <ExternalLink className="h-4 w-4 shrink-0" /> https://khoindvn.io.vn/
+              </a>
+            </div>
+
+            {/* Step 3: files */}
+            <div className="panel space-y-3 p-6">
+              <h2 className="text-lg font-bold">3. Fichiers disponibles</h2>
+              <p className="text-sm text-muted-foreground">
+                Votre code reste valable pendant toute la durée de la session (10 minutes), puis il expire.
+              </p>
               <ul className="divide-y divide-border border-y border-border">
                 {files.map((f) => (
                   <li key={f.id} className="flex items-center justify-between gap-3 py-3">
@@ -162,21 +259,6 @@ function Index() {
                 ))}
                 {files.length === 0 && <li className="py-3 text-sm text-muted-foreground">Aucun fichier disponible.</li>}
               </ul>
-              {profileHref && (
-                <div className="space-y-2 rounded-xl border border-border p-4">
-                  <p className="text-sm font-medium">Profil DNS VCAMPRO INSTALLER</p>
-                  <p className="text-xs text-muted-foreground">
-                    Ouvrez cette page dans Safari sur votre iPhone, puis installez le profil dans Réglages.
-                    Le lien est valable 10 minutes.
-                  </p>
-                  <a
-                    href={profileHref}
-                    className="btn-gradient flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110"
-                  >
-                    <ShieldCheck className="h-4 w-4" /> Installer le profil DNS
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         )}
