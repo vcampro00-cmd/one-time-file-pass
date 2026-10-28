@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AchatRetourRouteImport } from './routes/achat.retour'
+import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +46,11 @@ const AchatRetourRoute = AchatRetourRouteImport.update({
   path: '/achat/retour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicDnsProfileRoute = ApiPublicDnsProfileRouteImport.update({
+  id: '/api/public/dns-profile',
+  path: '/api/public/dns-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +76,25 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/sitemap.xml' | '/painel' | '/achat/retour'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/painel'
+    | '/achat/retour'
+    | '/api/public/dns-profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/sitemap.xml' | '/painel' | '/achat/retour'
+  to:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/painel'
+    | '/achat/retour'
+    | '/api/public/dns-profile'
   id:
     | '__root__'
     | '/'
@@ -82,6 +103,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/painel'
     | '/achat/retour'
+    | '/api/public/dns-profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -90,6 +112,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
+  ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -136,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AchatRetourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/dns-profile': {
+      id: '/api/public/dns-profile'
+      path: '/api/public/dns-profile'
+      fullPath: '/api/public/dns-profile'
+      preLoaderRoute: typeof ApiPublicDnsProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
+  ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
