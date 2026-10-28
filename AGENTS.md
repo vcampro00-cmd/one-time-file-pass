@@ -15,3 +15,6 @@
 - Files live in the private `files` bucket under `<owner_id>/...`; visitors only get short-lived signed URLs.
 - Use the shared BrandLogo component for site branding so all screens reference the same uploaded asset; derive the favicon from that asset's symbol.
 - Keep server-function chains on the builder methods the installed `@tanstack/start-client-core` actually exports (check `node_modules` before writing a chain): the current build exposes `.validator()`, not `.inputValidator()`, and a renamed method typechecks but crashes the whole page at render.
+
+- Derive sitemap URLs from required route staticData.sitemap decisions through the versioned sitemap helper; exclude owner, auth and purchase flows so future routes cannot leak into search by default.
+- Keep one shared router-core version across Router and Start so server-route type augmentations reach the same module.

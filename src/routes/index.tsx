@@ -10,6 +10,7 @@ import { BuyCode } from "@/components/buy-code";
 import { RecoverCode } from "@/components/recover-code";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "VCAMPRO INSTALLER — Téléchargez vos fichiers avec un code" },
