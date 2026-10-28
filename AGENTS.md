@@ -18,3 +18,4 @@
 
 - Derive sitemap URLs from required route staticData.sitemap decisions through the versioned sitemap helper; exclude owner, auth and purchase flows so future routes cannot leak into search by default.
 - Keep one shared router-core version across Router and Start so server-route type augmentations reach the same module.
+- Serve the DNS profile only through the public download handler with a 10-minute HMAC token issued by successful code redemption; never place the profile in public assets, so a hidden button is not the only access control.
