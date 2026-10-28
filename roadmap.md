@@ -13,4 +13,4 @@
 
 - [x] Review SEO foundations and add a router-derived public sitemap, excluding owner, auth and purchase flows.
 - [x] Add the VCAMPRO INSTALLER DNS profile with the owner's logo and site shortcut, downloadable only after a valid code through a 10-minute signed link.
-- [ ] French VCAMPRO camera menu companion: arm64 .deb built (VCAMPRO_Menu_Francais_0.1.0.deb); waiting on owner iPhone test. arm64e slice not built (no linker support here).
+- [ ] French VCAMPRO camera menu: VCAMPRO_Virtual_Camera_1.1.0.deb has French menu only for arm64 App Store apps; home screen/Apple apps stay Chinese. Blocked on a Mac with Apple's arm64e linker; waiting on owner test inside an App Store app.
