@@ -124,7 +124,7 @@ function Painel() {
     <main className="grid-paper min-h-screen">
       <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <BrandLogo className="h-20 w-32 shrink-0 sm:h-24 sm:w-36" />
+          <BrandLogo className="h-14 w-24 shrink-0 sm:h-16 sm:w-28" />
           <span className="font-mono text-xs font-bold break-words">TABLEAU DE BORD</span>
         </div>
         <Button variant="ghost" size="sm" onClick={signOut}>
@@ -133,7 +133,7 @@ function Painel() {
       </header>
 
       <div className="mx-auto grid max-w-5xl gap-6 px-4 pb-16 lg:grid-cols-[1.4fr_1fr]">
-        <section className="panel p-6">
+        <section className="lock-card rounded-3xl p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-bold">Fichiers</h2>
             <input ref={inputRef} type="file" multiple hidden onChange={(e) => upload(e.target.files)} />
@@ -157,14 +157,19 @@ function Painel() {
         </section>
 
         <section className="space-y-6">
-          <div className="panel p-6">
+          <div className="lock-card rounded-3xl p-6">
             <h2 className="mb-1 text-xl font-bold">Générer un code</h2>
             <p className="mb-4 text-sm text-muted-foreground">
               {selected.size} fichier(s) sélectionné(s). Usage unique, valable 10 minutes.
             </p>
-            <Button className="w-full" variant="secondary" disabled={selected.size === 0} onClick={generate}>
-              <KeyRound /> Générer un code
-            </Button>
+            <button
+              type="button"
+              className="btn-gradient flex h-10 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={selected.size === 0}
+              onClick={generate}
+            >
+              <KeyRound className="h-4 w-4" /> Générer un code
+            </button>
             {latest && (
               <div className="mt-5 border-2 border-dashed border-accent p-4 text-center">
                 <p className="font-mono text-3xl font-bold tracking-[0.2em]">{formatCode(latest.code)}</p>
@@ -188,7 +193,7 @@ function Painel() {
             )}
           </div>
 
-          <div className="panel p-6">
+          <div className="lock-card rounded-3xl p-6">
             <h2 className="mb-3 text-lg font-bold">Codes récents</h2>
             <ul className="space-y-2 text-sm">
               {codes.data?.map((c) => {
