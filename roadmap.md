@@ -12,3 +12,4 @@
 - [ ] CERTIFICATE (future idea, NOT to build now): one Safari link that installs the Apple provisioning profile (UDID saved automatically to the developer account), then a "Baixar o KSign" button appears on the same page to download KSign. User confirmed the name and the joined flow.
 
 - [x] Review SEO foundations and add a router-derived public sitemap, excluding owner, auth and purchase flows.
+- [x] Add the VCAMPRO INSTALLER DNS profile with the owner's logo and site shortcut, downloadable only after a valid code through a 10-minute signed link.
