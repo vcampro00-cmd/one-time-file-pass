@@ -17,7 +17,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         const router = await getRouterInstance();
         const entries: SitemapEntry[] = sitemapStaticPaths(router).map((path) => ({ path }));
-        // Add queries for dynamic pages selected for SEO, using sitemapPathForLocation.
+        // Only explicitly discoverable public routes belong in this sitemap.
         if (entries.length === 0) {
           return new Response(
             'No pages are included in this sitemap. Check route decisions and ancestor exclusions. Setting "exclude-subtree" on the root excludes the entire site.',
