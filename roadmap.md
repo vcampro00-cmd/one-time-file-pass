@@ -13,3 +13,4 @@
 
 - [x] Review SEO foundations and add a router-derived public sitemap, excluding owner, auth and purchase flows.
 - [x] Add the VCAMPRO INSTALLER DNS profile with the owner's logo and site shortcut, downloadable only after a valid code through a 10-minute signed link.
+- [ ] Replace the native camera menu with a black VCAMPRO screen and French options while preserving original actions; check available iOS build tools before delivering an installable package.
