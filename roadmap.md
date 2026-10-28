@@ -7,3 +7,5 @@
 - [x] Add the owner's permanent test code 170-214 and make the middle dash appear automatically while typing; verify unlock, masking and rejection of a wrong code in the preview.
 - [x] Add a 10 € button to buy a 10-minute code generated automatically after payment.
 - [x] Add a button that shows a purchased code again in the same browser while it is still valid, and hides it once the code has been used or has expired.
+
+- [ ] Future idea (NOT to build now): a CERTIFICATE button that generates a Safari link to install the Apple provisioning profile and save the device UDID to the developer account; after the certificate is issued, a second Safari link to download KSign for signing apps. User said this is just an idea for later.
