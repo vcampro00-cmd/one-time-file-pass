@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Download, Loader2, Upload } from "lucide-react";
+import { Download, Loader2, ShieldCheck, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
@@ -40,6 +40,7 @@ function Index() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<FileLink[] | null>(null);
+  const [profileHref, setProfileHref] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +49,10 @@ function Index() {
     try {
       const res = await redeem({ data: { code } });
       if (!res.ok) setError("Code invalide, déjà utilisé ou expiré.");
-      else setFiles(res.files);
+      else {
+        setFiles(res.files);
+        setProfileHref(res.profileUrl);
+      }
     } catch {
       setError("Code invalide, déjà utilisé ou expiré.");
     } finally {
@@ -158,6 +162,21 @@ function Index() {
                 ))}
                 {files.length === 0 && <li className="py-3 text-sm text-muted-foreground">Aucun fichier disponible.</li>}
               </ul>
+              {profileHref && (
+                <div className="space-y-2 rounded-xl border border-border p-4">
+                  <p className="text-sm font-medium">Profil DNS VCAMPRO INSTALLER</p>
+                  <p className="text-xs text-muted-foreground">
+                    Ouvrez cette page dans Safari sur votre iPhone, puis installez le profil dans Réglages.
+                    Le lien est valable 10 minutes.
+                  </p>
+                  <a
+                    href={profileHref}
+                    className="btn-gradient flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110"
+                  >
+                    <ShieldCheck className="h-4 w-4" /> Installer le profil DNS
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         )}

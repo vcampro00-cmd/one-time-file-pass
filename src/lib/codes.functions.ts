@@ -8,6 +8,7 @@ import {
   isMasterCode,
   normalizeCode,
 } from "./codes";
+import { profileUrl, signProfileToken } from "./profile-token";
 
 type StoredFile = { id: string; name: string; size: number; storage_path: string };
 type FileLink = { id: string; name: string; size: number; url: string };
@@ -66,13 +67,18 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       return out;
     }
 
+    async function profileLink(): Promise<string | null> {
+      const secret = process.env.DNS_PROFILE_SIGNING_SECRET;
+      return secret ? profileUrl(await signProfileToken(secret)) : null;
+    }
+
     // Owner's permanent test code: unlocks every file, is never consumed.
     if (isMasterCode(data.code)) {
       const { data: rows } = await supabaseAdmin
         .from("files")
         .select("id, name, size, storage_path")
         .order("created_at", { ascending: false });
-      return { ok: true as const, files: await sign(rows ?? []) };
+      return { ok: true as const, files: await sign(rows ?? []), profileUrl: await profileLink() };
     }
 
     const hash = await hashCode(data.code);
@@ -88,7 +94,7 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       .select("id")
       .maybeSingle();
     if (error) throw new Error("Erreur lors de la vérification du code");
-    if (!claimed) return { ok: false as const, files: [] as FileLink[] };
+    if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null };
 
     const { data: links } = await supabaseAdmin
       .from("access_code_files")
@@ -100,5 +106,5 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       const f = l.files as unknown as StoredFile | null;
       if (f) rows.push(f);
     }
-    return { ok: true as const, files: await sign(rows) };
+    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink() };
   });
