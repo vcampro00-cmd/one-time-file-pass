@@ -8,6 +8,5 @@
 - [x] Add a 10 € button to buy a 10-minute code generated automatically after payment.
 - [x] Add a button that shows a purchased code again in the same browser while it is still valid, and hides it once the code has been used or has expired.
 
-- [ ] Future idea (NOT to build now): a CERTIFICATE button that generates a Safari link to install the Apple provisioning profile and save the device UDID to the developer account; after the certificate is issued, a second Safari link to download KSign for signing apps. User said this is just an idea for later.
 
 - [ ] CERTIFICATE (future idea, NOT to build now): one Safari link that installs the Apple provisioning profile (UDID saved automatically to the developer account), then a "Baixar o KSign" button appears on the same page to download KSign. User confirmed the name and the joined flow.
