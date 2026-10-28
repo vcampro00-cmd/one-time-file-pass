@@ -78,23 +78,23 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
         .from("files")
         .select("id, name, size, storage_path")
         .order("created_at", { ascending: false });
-      return { ok: true as const, files: await sign(rows ?? []), profileUrl: await profileLink() };
+      return { ok: true as const, files: await sign(rows ?? []), profileUrl: await profileLink(), expiresAt: null as string | null };
     }
 
     const hash = await hashCode(data.code);
     const nowIso = new Date().toISOString();
 
-    // Atomic: only succeeds if unused and not expired.
+    // Valid for its whole 10-minute window: reusable until expires_at, first use is recorded.
     const { data: claimed, error } = await supabaseAdmin
       .from("access_codes")
-      .update({ used_at: nowIso })
+      .select("id, used_at, expires_at")
       .eq("code_hash", hash)
-      .is("used_at", null)
       .gt("expires_at", nowIso)
-      .select("id")
       .maybeSingle();
     if (error) throw new Error("Erreur lors de la vérification du code");
-    if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null };
+    if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null, expiresAt: null };
+    if (!claimed.used_at)
+      await supabaseAdmin.from("access_codes").update({ used_at: nowIso }).eq("id", claimed.id).is("used_at", null);
 
     const { data: links } = await supabaseAdmin
       .from("access_code_files")
@@ -106,5 +106,5 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       const f = l.files as unknown as StoredFile | null;
       if (f) rows.push(f);
     }
-    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink() };
+    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), expiresAt: claimed.expires_at as string | null };
   });
