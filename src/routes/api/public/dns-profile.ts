@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/public/dns-profile")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const secret = process.env.DNS_PROFILE_SIGNING_SECRET;
+        const secret = process.env["DNS_PROFILE_SIGNING_SECRET"];
         const token = new URL(request.url).searchParams.get("t") ?? "";
         if (!secret || !(await verifyProfileToken(secret, token))) {
           return new Response("Lien expiré. Saisissez un nouveau code sur vcamproinstaller.com.", {

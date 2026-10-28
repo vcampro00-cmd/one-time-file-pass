@@ -68,7 +68,7 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
     }
 
     async function profileLink(): Promise<string | null> {
-      const secret = process.env.DNS_PROFILE_SIGNING_SECRET;
+      const secret = process.env["DNS_PROFILE_SIGNING_SECRET"];
       return secret ? profileUrl(await signProfileToken(secret)) : null;
     }
 
