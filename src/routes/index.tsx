@@ -186,7 +186,7 @@ function Index() {
                 <span aria-hidden className="wordmark-dash-right h-0.5 w-7 rounded-full" />
               </div>
               <p className="mt-4 text-xs text-muted-foreground">
-                Chaque code ne peut être utilisé qu’une seule fois et expire après 10 minutes.
+                Chaque code reste valable 10 minutes, puis expire définitivement.
               </p>
             </div>
 
