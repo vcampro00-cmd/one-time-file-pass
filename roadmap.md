@@ -1,6 +1,8 @@
 # Roadmap
 
-- [ ] Billing and renewable VCAMPRO licenses: vcamproinstaller.com, 15 €/7 days and 60 €/30 days; manual renewals. Separate purchase, login and owner panel; validate paid flow and permissions. Native app integration is separate and not yet implemented.
+- [x] Build separate licensing purchase, owner login and management screens; 15 €/7 days and 60 €/30 days, manual renewals; creation, suspension, reactivation and customer lookup verified with owner session. Existing download panel untouched. Tests passing.
+- [ ] Complete a preview test purchase/renewal: Stripe checkout rendered but card fields could not be driven in two browser attempts; owner can test in /licences with 4242 4242 4242 4242, future expiry and any CVC. Paid fulfillment and same-code renewal remain unverified end-to-end.
+- [ ] Connect licenses to the native VCAMPRO app: source/build environment from the earlier package is unavailable; app activation, device binding and license enforcement are not implemented. Website licensing does not yet restrict the installed app.
 
 - [x] Translate all site screens, messages and date formatting into French without changing password rules; verify home, login and authenticated owner panel.
 
