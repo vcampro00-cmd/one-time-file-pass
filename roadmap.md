@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Redesign existing website presentation in black/red cybersecurity style, preserve logo shape and all content/flows, verify desktop/mobile preview and report changed files; no publishing or backend changes.
+- [x] Redesign existing website presentation in black/red cybersecurity style, preserve logo shape and all content/flows; desktop/mobile home, unlock, login, licences and authenticated panels verified without overflow or runtime errors. 19 regression tests passed; no publishing or backend changes.
 
 - [x] Build separate licensing purchase, owner login and management screens; 15 €/7 days and 60 €/30 days, manual renewals; creation, suspension, reactivation and customer lookup verified with owner session. Existing download panel untouched. Tests passing.
 - [ ] Complete a preview test purchase/renewal: Stripe checkout rendered but card fields could not be driven in two browser attempts; owner can test in /licences with 4242 4242 4242 4242, future expiry and any CVC. Paid fulfillment and same-code renewal remain unverified end-to-end.
