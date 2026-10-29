@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Redesign existing website presentation in black/red cybersecurity style, preserve logo shape and all content/flows, verify desktop/mobile preview and report changed files; no publishing or backend changes.
+
 - [x] Build separate licensing purchase, owner login and management screens; 15 €/7 days and 60 €/30 days, manual renewals; creation, suspension, reactivation and customer lookup verified with owner session. Existing download panel untouched. Tests passing.
 - [ ] Complete a preview test purchase/renewal: Stripe checkout rendered but card fields could not be driven in two browser attempts; owner can test in /licences with 4242 4242 4242 4242, future expiry and any CVC. Paid fulfillment and same-code renewal remain unverified end-to-end.
 - [x] Reconstruct native VCAMPRO 1.3 with French activation, HTTPS live-license checks at foreground/protected commands, preview, rotation, mirror and disable; restore Clang/iOS SDK/ld64.lld/ldid/dpkg-deb and deliver VCAMPRO_App_1.3.deb. Source and reproducible build retained in native/vcampro. Native authorization tests and 8 website license/webhook tests passed; logo/icons unchanged; original camera tweak untouched and remains required.
