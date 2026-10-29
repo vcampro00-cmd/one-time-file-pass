@@ -1,9 +1,8 @@
-import type Stripe from "stripe";
 import { createStripeClient, type StripeEnv } from "./stripe.server";
 import { generateLicenseCode, LICENSE_PLANS } from "./licenses";
 
 // Shared by the paid return and verified webhook, not by RPC-to-RPC calls.
-export async function fulfillLicense(session: Stripe.Checkout.Session, environment: StripeEnv) {
+export async function fulfillLicense(session: { id: string; status: string | null; payment_status: string; metadata: Record<string, string> | null }, environment: StripeEnv) {
   if (session.metadata?.["kind"] !== "vcampro_license" || session.status !== "complete" || session.payment_status !== "paid")
     throw new Error("Paiement non confirmé.");
   const plan = session.metadata["plan"];

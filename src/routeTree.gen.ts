@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LicencesRouteImport } from './routes/licences'
+import { Route as LicencesConnexionRouteImport } from './routes/licences-connexion'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_authenticated/gestion-licences'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
@@ -39,6 +40,11 @@ const AuthRoute = AuthRouteImport.update({
 const LicencesRoute = LicencesRouteImport.update({
   id: '/licences',
   path: '/licences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicencesConnexionRoute = LicencesConnexionRouteImport.update({
+  id: '/licences-connexion',
+  path: '/licences-connexion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
+  '/licences-connexion': typeof LicencesConnexionRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
+  '/licences-connexion': typeof LicencesConnexionRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
+  '/licences-connexion': typeof LicencesConnexionRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/licences'
+    | '/licences-connexion'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/licences'
+    | '/licences-connexion'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/licences'
+    | '/licences-connexion'
     | '/sitemap.xml'
     | '/_authenticated/gestion-licences'
     | '/_authenticated/painel'
@@ -173,6 +185,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LicencesRoute: typeof LicencesRoute
+  LicencesConnexionRoute: typeof LicencesConnexionRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
   LicencesRetourRoute: typeof LicencesRetourRoute
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/licences'
       fullPath: '/licences'
       preLoaderRoute: typeof LicencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licences-connexion': {
+      id: '/licences-connexion'
+      path: '/licences-connexion'
+      fullPath: '/licences-connexion'
+      preLoaderRoute: typeof LicencesConnexionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LicencesRoute: LicencesRoute,
+  LicencesConnexionRoute: LicencesConnexionRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
   LicencesRetourRoute: LicencesRetourRoute,

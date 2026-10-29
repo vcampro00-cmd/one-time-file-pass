@@ -35,7 +35,7 @@ export const createLicenseCheckout = createServerFn({ method: "POST" })
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: price.id, quantity: 1 }], mode: "payment", ui_mode: "embedded_page", locale: "fr",
         return_url: `${data.origin}/licences/retour?session_id={CHECKOUT_SESSION_ID}`,
-        managed_payments: { enabled: true }, payment_intent_data: { description: product.name },
+        ...{ managed_payments: { enabled: true } }, payment_intent_data: { description: product.name },
         metadata: { kind: "vcampro_license", plan: data.plan, ...(licenseId ? { license_id: licenseId } : {}) },
       });
       if (!session.client_secret) throw new Error("Paiement indisponible.");

@@ -1,4 +1,3 @@
-import type Stripe from "stripe";
 import { z } from "zod";
 
 export async function verifyLicenseWebhook(request: Request, environment: "sandbox" | "live") {
@@ -18,6 +17,6 @@ export async function verifyLicenseWebhook(request: Request, environment: "sandb
     if (await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(`${timestamp}.${body}`))) verified = true;
   }
   if (!verified) throw new Error("Invalid signature");
-  const event = z.object({ type: z.string().max(150), data: z.object({ object: z.object({ id: z.string().max(255), metadata: z.record(z.string()).nullable().optional() }).passthrough() }) }).parse(JSON.parse(body));
-  return event as { type: string; data: { object: Stripe.Checkout.Session } };
+  const event = z.object({ type: z.string().max(150), data: z.object({ object: z.object({ id: z.string().max(255), status: z.string().nullable().optional(), payment_status: z.string().optional(), metadata: z.record(z.string()).nullable().optional() }).passthrough() }) }).parse(JSON.parse(body));
+  return { type: event.type, data: { object: { id: event.data.object.id, status: event.data.object.status ?? null, payment_status: event.data.object.payment_status ?? "unpaid", metadata: event.data.object.metadata ?? null } } };
 }
