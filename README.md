@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# One Time File Pass
+
+Quero fazer um site aonde eu posso colocar arquivos para serem baixados com senhas que eu gero na horas e elas se expiram em alguns minutos e nao podem ser mais usadas
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://one-time-file-pass.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/57e81844-5c88-46cd-99a3-b9ade9b2c438).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
