@@ -11,7 +11,8 @@ cp "$TEMPLATE/"*.png "$APP/"
 CLANG=$(nix build nixpkgs#clang --no-link --print-out-paths)/bin/clang
 "$CLANG" "$ROOT/LicensePolicy.test.c" -o "$OUT/license-policy-test"
 "$OUT/license-policy-test"
-"$CLANG" -target arm64-apple-ios15.0 -isysroot "$SDK" -fobjc-arc -fblocks -O2 -c "$ROOT/main.m" -o "$OUT/main.o"
+IOS_CLANG=$(nix build nixpkgs#clang.cc --no-link --print-out-paths)/bin/clang
+"$IOS_CLANG" -target arm64-apple-ios15.0 -isysroot "$SDK" -F"$SDK/System/Library/Frameworks" -fobjc-arc -fblocks -O2 -c "$ROOT/main.m" -o "$OUT/main.o"
 ld64.lld -arch arm64 -platform_version ios 15.0 16.5 -syslibroot "$SDK" -o "$APP/VCAMPRO" "$OUT/main.o" \
   -L"$SDK/usr/lib" -lSystem -lobjc -framework Foundation -framework UIKit -framework AVFoundation \
   -framework AVKit -framework MobileCoreServices -framework CoreMedia -framework CoreGraphics -framework QuartzCore
