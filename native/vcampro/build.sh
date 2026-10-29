@@ -43,4 +43,5 @@ uicache -p /var/jb/Applications/VCAMPRO.app 2>/dev/null || uicache --all 2>/dev/
 exit 0
 EOF
 chmod 755 "$OUT/package/DEBIAN/postinst"
-nix run nixpkgs#dpkg -- --build --root-owner-group "$OUT/package" "$OUT/VCAMPRO_App_1.3.deb"
+DPKG_DEB=$(nix build nixpkgs#dpkg --no-link --print-out-paths)/bin/dpkg-deb
+"$DPKG_DEB" --build --root-owner-group -Zgzip "$OUT/package" "$OUT/VCAMPRO_App_1.3.deb"
