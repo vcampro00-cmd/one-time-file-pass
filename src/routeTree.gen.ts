@@ -12,10 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LicencesRouteImport } from './routes/licences'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_authenticated/gestion-licences'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AchatRetourRouteImport } from './routes/achat.retour'
+import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
+import { Route as ApiPublicLicensesVerifyRouteImport } from './routes/api/public/licenses/verify'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,11 +36,22 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LicencesRoute = LicencesRouteImport.update({
+  id: '/licences',
+  path: '/licences',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedGestionLicencesRoute =
+  AuthenticatedGestionLicencesRouteImport.update({
+    id: '/gestion-licences',
+    path: '/gestion-licences',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -46,73 +62,123 @@ const AchatRetourRoute = AchatRetourRouteImport.update({
   path: '/achat/retour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LicencesRetourRoute = LicencesRetourRouteImport.update({
+  id: '/licences_/retour',
+  path: '/licences/retour',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDnsProfileRoute = ApiPublicDnsProfileRouteImport.update({
   id: '/api/public/dns-profile',
   path: '/api/public/dns-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicLicensesVerifyRoute = ApiPublicLicensesVerifyRouteImport.update({
+  id: '/api/public/licenses/verify',
+  path: '/api/public/licenses/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/licences': typeof LicencesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
+  '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/licences': typeof LicencesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
+  '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/licences': typeof LicencesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/licences_/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
+  '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/licences'
     | '/sitemap.xml'
+    | '/gestion-licences'
     | '/painel'
     | '/achat/retour'
+    | '/licences/retour'
     | '/api/public/dns-profile'
+    | '/api/public/licenses/verify'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/licences'
     | '/sitemap.xml'
+    | '/gestion-licences'
     | '/painel'
     | '/achat/retour'
+    | '/licences/retour'
     | '/api/public/dns-profile'
+    | '/api/public/licenses/verify'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/licences'
     | '/sitemap.xml'
+    | '/_authenticated/gestion-licences'
     | '/_authenticated/painel'
     | '/achat/retour'
+    | '/licences_/retour'
     | '/api/public/dns-profile'
+    | '/api/public/licenses/verify'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LicencesRoute: typeof LicencesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
+  LicencesRetourRoute: typeof LicencesRetourRoute
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
+  ApiPublicLicensesVerifyRoute: typeof ApiPublicLicensesVerifyRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,12 +204,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/licences': {
+      id: '/licences'
+      path: '/licences'
+      fullPath: '/licences'
+      preLoaderRoute: typeof LicencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/gestion-licences': {
+      id: '/_authenticated/gestion-licences'
+      path: '/gestion-licences'
+      fullPath: '/gestion-licences'
+      preLoaderRoute: typeof AuthenticatedGestionLicencesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
@@ -159,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AchatRetourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/licences_/retour': {
+      id: '/licences_/retour'
+      path: '/licences/retour'
+      fullPath: '/licences/retour'
+      preLoaderRoute: typeof LicencesRetourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/dns-profile': {
       id: '/api/public/dns-profile'
       path: '/api/public/dns-profile'
@@ -166,14 +253,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDnsProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/licenses/verify': {
+      id: '/api/public/licenses/verify'
+      path: '/api/public/licenses/verify'
+      fullPath: '/api/public/licenses/verify'
+      preLoaderRoute: typeof ApiPublicLicensesVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedGestionLicencesRoute: typeof AuthenticatedGestionLicencesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedGestionLicencesRoute: AuthenticatedGestionLicencesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
 }
 
@@ -184,9 +287,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LicencesRoute: LicencesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
+  LicencesRetourRoute: LicencesRetourRoute,
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
+  ApiPublicLicensesVerifyRoute: ApiPublicLicensesVerifyRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

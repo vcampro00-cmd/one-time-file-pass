@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Billing and renewable VCAMPRO licenses: separate panel from download administration. Waiting for confirmation of domain spelling, prices and renewal mode before configuring charges.
+- [ ] Billing and renewable VCAMPRO licenses: vcamproinstaller.com, 15 €/7 days and 60 €/30 days; manual renewals. Separate purchase, login and owner panel; validate paid flow and permissions. Native app integration is separate and not yet implemented.
 
 - [x] Translate all site screens, messages and date formatting into French without changing password rules; verify home, login and authenticated owner panel.
 
