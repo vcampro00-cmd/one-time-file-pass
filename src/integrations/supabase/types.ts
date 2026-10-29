@@ -125,12 +125,104 @@ export type Database = {
         }
         Relationships: []
       }
+      license_operators: {
+        Row: {
+          user_id: string
+        }
+        Insert: {
+          user_id: string
+        }
+        Update: {
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vcampro_license_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          environment: string
+          license_id: string
+          plan: string
+          session_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          environment: string
+          license_id: string
+          plan: string
+          session_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          license_id?: string
+          plan?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vcampro_license_payments_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "vcampro_licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vcampro_licenses: {
+        Row: {
+          code: string
+          created_at: string
+          customer_label: string
+          environment: string
+          expires_at: string
+          id: string
+          owner_id: string
+          revoked: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          customer_label?: string
+          environment: string
+          expires_at: string
+          id?: string
+          owner_id: string
+          revoked?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          customer_label?: string
+          environment?: string
+          expires_at?: string
+          id?: string
+          owner_id?: string
+          revoked?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      fulfill_vcampro_license: {
+        Args: {
+          p_code: string
+          p_env: string
+          p_license?: string
+          p_plan: string
+          p_session: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

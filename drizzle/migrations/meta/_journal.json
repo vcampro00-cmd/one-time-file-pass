@@ -15,6 +15,13 @@
       "when": 1793122331754,
       "tag": "0001_code_purchases",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793284903454,
+      "tag": "0002_separate_vcampro_licensing",
+      "breakpoints": true
     }
   ]
 }
