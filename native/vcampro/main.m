@@ -160,9 +160,10 @@ static NSString * const VCVerifyURL = @"https://vcamproinstaller.com/api/public/
         NSURL *stage = [NSURL fileURLWithPath:[dir stringByAppendingPathComponent:[NSString stringWithFormat:@"vcampro_%@.mov", NSUUID.UUID.UUIDString]]];
         BOOL ok = !error && [fm copyItemAtURL:source toURL:stage error:&error];
         dispatch_async(dispatch_get_main_queue(), ^{
-          if (ok && [self allowed]) ok = [self installVideo:stage error:&error]; else ok = NO;
+          NSError *installError = nil;
+          BOOL installed = ok && [self allowed] && [self installVideo:stage error:&installError];
           [fm removeItemAtURL:stage error:nil]; self.editing = NO; [self updateControls];
-          [self message:ok ? @"Vidéo sélectionnée" : @"Vidéo non remplacée. Vérifiez la licence et les autorisations."];
+          [self message:installed ? @"Vidéo sélectionnée" : @"Vidéo non remplacée. Vérifiez la licence et les autorisations."];
         });
       });
     }];
@@ -220,7 +221,7 @@ static NSString * const VCVerifyURL = @"https://vcamproinstaller.com/api/public/
 @end
 
 @interface VCApp : UIResponder <UIApplicationDelegate>
-@property UIWindow *window;
+@property (nonatomic, strong) UIWindow *window;
 @end
 @implementation VCApp
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)options {
