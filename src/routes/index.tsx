@@ -119,15 +119,15 @@ function Index() {
   }
 
   return (
-    <main className="grid-paper flex min-h-screen flex-col">
-      <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <main className="grid-paper access-workspace flex min-h-screen flex-col">
+      <header className="cyber-header flex items-center justify-between gap-4 px-4 py-3 sm:px-8">
         <BrandLogo className="h-14 w-24 shrink-0 sm:h-16 sm:w-28" />
-        <Link to="/painel" className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+        <Link to="/painel" className="border-l border-primary/50 pl-4 font-mono text-xs uppercase text-muted-foreground transition-colors hover:text-accent">
           Espace propriétaire →
         </Link>
       </header>
 
-      <section className="flex flex-1 items-center justify-center px-4 pb-16">
+      <section className="flex flex-1 items-start justify-center px-4 pb-16 pt-28 sm:pt-32">
         {!files ? (
           <form onSubmit={submit} className="flex w-full max-w-sm flex-col items-center">
             {/* The code entry is the padlock itself, in the logo's colors. */}
@@ -162,27 +162,28 @@ function Index() {
                   autoFocus
                   maxLength={9}
                   aria-label="Code d'accès"
-                  className="w-full bg-transparent text-center font-mono text-2xl uppercase tracking-[0.25em] text-foreground outline-none placeholder:text-muted-foreground/60"
+                  className="w-full border-b border-primary/30 bg-transparent pb-3 text-center font-mono text-2xl uppercase text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-accent"
                 />
                 <p className="min-h-5 text-center text-sm font-medium text-destructive">{error}</p>
-                <button
+                <Button
                   type="submit"
+                  variant="brand"
                   disabled={loading || !isCodeComplete(code)}
-                  className="btn-gradient flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-11 w-full rounded-md font-mono text-xs font-bold uppercase"
                 >
                   {loading ? <Loader2 className="animate-spin" /> : "Déverrouiller"}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Wordmark, as on the logo. */}
             <div className="mt-7 text-center">
-              <h1 className="wordmark-gradient text-5xl font-black italic tracking-tight sm:text-6xl">
+              <h1 className="wordmark-gradient text-5xl font-black italic sm:text-6xl">
                 VCAMPRO
               </h1>
               <div className="wordmark-pill mt-3 inline-flex items-center gap-3 rounded-full px-5 py-1.5">
                 <span aria-hidden className="wordmark-dash-left h-0.5 w-7 rounded-full" />
-                <span className="text-xs font-bold uppercase tracking-[0.4em]">Installer</span>
+                <span className="font-mono text-xs font-bold uppercase">Installer</span>
                 <span aria-hidden className="wordmark-dash-right h-0.5 w-7 rounded-full" />
               </div>
               <p className="mt-4 text-xs text-muted-foreground">
@@ -204,7 +205,7 @@ function Index() {
             )}
 
             {/* Step 1: DNS profile, step by step */}
-            <div className="panel space-y-3 p-6">
+            <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">1. Profil DNS</h2>
               <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
                 <li>Ouvrez cette page dans Safari sur votre iPhone.</li>
@@ -212,33 +213,36 @@ function Index() {
                 <li>Ouvrez Réglages › Profil téléchargé › Installer.</li>
               </ol>
               {profileHref ? (
+                <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
                 <a
                   href={profileHref}
-                  className="btn-gradient flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold uppercase tracking-wider transition hover:brightness-110"
                 >
                   <ShieldCheck className="h-4 w-4" /> Installer le profil DNS
                 </a>
+                </Button>
               ) : (
                 <p className="text-xs text-muted-foreground">Profil indisponible pour le moment.</p>
               )}
             </div>
 
             {/* Step 2: link */}
-            <div className="panel space-y-3 p-6">
+            <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">2. Lien</h2>
               <p className="text-sm text-muted-foreground">Appuyez sur le lien ci-dessous.</p>
+              <Button asChild variant="outline" className="h-11 w-full text-accent">
               <a
                 href="https://khoindvn.io.vn/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 break-all rounded-full border border-border px-4 py-2.5 text-sm font-medium text-accent transition hover:bg-foreground/5"
+                className="break-all"
               >
                 <ExternalLink className="h-4 w-4 shrink-0" /> https://khoindvn.io.vn/
               </a>
+              </Button>
             </div>
 
             {/* Step 3: files */}
-            <div className="panel space-y-3 p-6">
+            <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">3. Fichiers disponibles</h2>
               <p className="text-sm text-muted-foreground">
                 Votre code reste valable pendant toute la durée de la session (10 minutes), puis il expire.
