@@ -262,24 +262,6 @@ function Index() {
               </ul>
             </div>
 
-            {/* Step 4: virtual camera menu guide (translated) */}
-            <div className="panel space-y-3 p-6">
-              <h2 className="text-lg font-bold">4. Guide — Caméra virtuelle</h2>
-              <p className="text-sm text-muted-foreground">
-                Appuyez sur <span className="font-semibold text-foreground">Volume +</span> puis sur{" "}
-                <span className="font-semibold text-foreground">Volume −</span> : le menu ci-dessous s’ouvre. Le menu
-                s’affiche en chinois — comparez avec cette traduction pour savoir ce que fait chaque bouton.
-              </p>
-              <img
-                src={menuGuideImg}
-                alt="Traduction française du menu de la caméra virtuelle : Choisir une vidéo, Désactiver le remplacement, Corriger l'inversion photo, Annuler"
-                className="w-full rounded-xl border border-border"
-                loading="lazy"
-              />
-              <p className="text-xs text-muted-foreground">
-                Utilisez des vidéos au format 4:3 ou 16:9 pour un résultat optimal.
-              </p>
-            </div>
           </div>
         )}
       </section>
