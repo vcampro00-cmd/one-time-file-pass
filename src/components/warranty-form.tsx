@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileCheck2 } from "lucide-react";
+import { FileCheck2, Smartphone } from "lucide-react";
 import logo from "@/assets/vcampro-installer-logo-red.png";
 import { Button } from "@/components/ui/button";
 import { isValidImei, warrantyEnd, WARRANTY_MONTHS } from "@/lib/warranty";
@@ -77,6 +77,53 @@ async function makePdf(name: string, imei: string) {
   doc.save(`Garantie-VCAMPRO-${imei}.pdf`);
 }
 
+const IMEI_STEPS: { title: string; text: string }[] = [
+  {
+    title: "Méthode 1 — Le plus rapide : *#06#",
+    text: "Ouvrez l’application Téléphone, composez *#06# sur le clavier. L’IMEI s’affiche immédiatement à l’écran, sans valider l’appel.",
+  },
+  {
+    title: "Méthode 2 — Dans les Réglages",
+    text: "Réglages → Général → Informations. Faites défiler vers le bas jusqu’à la ligne IMEI. Le numéro figure aussi sous « N° de série ».",
+  },
+  {
+    title: "Méthode 3 — Sur le tiroir de la carte SIM",
+    text: "iPhone 7 : insérez l’outil de simulation (ou un trombone) dans le petit trou du tiroir, côté gauche de l’appareil, puis sortez le tiroir. L’IMEI est gravé sur le tiroir.",
+  },
+  {
+    title: "Méthode 4 — Sur la boîte d’origine",
+    text: "L’étiquette au dos de la boîte indique l’IMEI à côté de la mention « IMEI » ou « IMEI/MEID ».",
+  },
+];
+
+function ImeiHelp() {
+  return (
+    <details className="panel group px-4 py-3">
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-foreground marker:hidden">
+        <Smartphone className="h-4 w-4 shrink-0 text-primary" />
+        Où trouver l’IMEI sur un iPhone 7 ?
+        <span className="ml-auto font-mono text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
+      </summary>
+      <ol className="mt-3 space-y-3 border-t border-border pt-3">
+        {IMEI_STEPS.map((step, i) => (
+          <li key={step.title} className="flex gap-3">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary font-mono text-[11px] font-bold text-primary">
+              {i + 1}
+            </span>
+            <span>
+              <span className="block text-sm font-semibold">{step.title}</span>
+              <span className="block text-sm text-muted-foreground">{step.text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 border-t border-border pt-3 font-mono text-xs text-muted-foreground">
+        L’IMEI compte 15 chiffres. Recopiez-le sans erreur : la garantie n’est valable que si ce numéro correspond à l’appareil.
+      </p>
+    </details>
+  );
+}
+
 export function WarrantyForm() {
   const [name, setName] = useState("");
   const [imei, setImei] = useState("");
@@ -100,6 +147,7 @@ export function WarrantyForm() {
       <p className="text-sm text-muted-foreground">Garantie de {WARRANTY_MONTHS} mois à partir d’aujourd’hui. Conservez le PDF.</p>
       <input className={input} placeholder="Nom complet" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="Nom complet" />
       <input className={`${input} font-mono`} placeholder="IMEI (composez *#06#)" inputMode="numeric" value={imei} maxLength={17} onChange={(e) => setImei(e.target.value.replace(/[^\d ]/g, ""))} aria-label="Numéro IMEI" />
+      <ImeiHelp />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" variant="brand" disabled={busy} className="h-11 w-full font-mono text-xs font-bold uppercase">
         <FileCheck2 className="h-4 w-4" /> Générer le certificat PDF
