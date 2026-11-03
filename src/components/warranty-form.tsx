@@ -49,7 +49,7 @@ async function makePdf(name: string, imei: string) {
   row(`Validité (${WARRANTY_MONTHS} mois)`, `Jusqu’au ${fmt(end)}`);
 
   y += 4;
-  doc.setFillColor(248, 240, 240); doc.setDrawColor(...red); doc.roundedRect(20, y, 170, 52, 2, 2, "FD");
+  doc.setFillColor(248, 240, 240); doc.setDrawColor(...red); doc.roundedRect(20, y, 170, 42, 2, 2, "FD");
   doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(...red);
   doc.text("Observation", 26, y + 9);
   doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(40, 40, 40);
@@ -66,7 +66,7 @@ async function makePdf(name: string, imei: string) {
   doc.text("VCAMPRO", cx, cy - 2, { align: "center" });
   doc.setFontSize(8); doc.text("INSTALLER", cx, cy + 4, { align: "center" });
   doc.setFontSize(6); doc.text("GARANTIE CERTIFIÉE", cx, cy + 10, { align: "center" });
-  doc.text("★ ★ ★", cx, cy - 9, { align: "center" });
+  doc.text("• • •", cx, cy - 9, { align: "center" });
   doc.setFont("times", "italic"); doc.setFontSize(16); doc.setTextColor(30, 30, 30);
   doc.text("VCAMPRO Installer", 30, 245);
   doc.setLineWidth(0.3); doc.setDrawColor(60, 60, 60); doc.line(25, 249, 100, 249);
