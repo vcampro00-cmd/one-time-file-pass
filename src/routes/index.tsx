@@ -8,6 +8,7 @@ import { redeemAccessCode } from "@/lib/codes.functions";
 import { isCodeComplete, maskCode } from "@/lib/codes";
 import { BuyCode } from "@/components/buy-code";
 import { RecoverCode } from "@/components/recover-code";
+import { WarrantyForm } from "@/components/warranty-form";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -265,6 +266,7 @@ function Index() {
               </ul>
             </div>
 
+            <WarrantyForm />
           </div>
         )}
       </section>

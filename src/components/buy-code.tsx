@@ -31,13 +31,13 @@ export function BuyCode() {
     <div className="space-y-2 border-t border-border pt-6">
       <p className="text-center text-sm text-muted-foreground">Pas de code ?</p>
       <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen(true)}>
-        <ShoppingCart /> Acheter un code — 10 €
+        <ShoppingCart /> Acheter un code — 60 €
       </Button>
       {isTest && <p className="text-center text-xs text-muted-foreground">Mode test : aucun vrai paiement.</p>}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Code d’accès 10 minutes — 10 €</DialogTitle>
+            <DialogTitle>Code d’accès 10 minutes — 60 €</DialogTitle>
           </DialogHeader>
           {open && <Checkout />}
         </DialogContent>
