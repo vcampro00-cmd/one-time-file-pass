@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileCheck2 } from "lucide-react";
+import { FileCheck2, Smartphone } from "lucide-react";
 import logo from "@/assets/vcampro-installer-logo-red.png";
 import { Button } from "@/components/ui/button";
 import { isValidImei, warrantyEnd, WARRANTY_MONTHS } from "@/lib/warranty";
@@ -100,6 +100,7 @@ export function WarrantyForm() {
       <p className="text-sm text-muted-foreground">Garantie de {WARRANTY_MONTHS} mois à partir d’aujourd’hui. Conservez le PDF.</p>
       <input className={input} placeholder="Nom complet" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="Nom complet" />
       <input className={`${input} font-mono`} placeholder="IMEI (composez *#06#)" inputMode="numeric" value={imei} maxLength={17} onChange={(e) => setImei(e.target.value.replace(/[^\d ]/g, ""))} aria-label="Numéro IMEI" />
+      <ImeiHelp />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" variant="brand" disabled={busy} className="h-11 w-full font-mono text-xs font-bold uppercase">
         <FileCheck2 className="h-4 w-4" /> Générer le certificat PDF
