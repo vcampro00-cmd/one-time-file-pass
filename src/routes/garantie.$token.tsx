@@ -32,7 +32,7 @@ function WarrantyPage() {
     <main className="grid-paper flex min-h-screen justify-center px-4 pt-16">
       <div className="w-full max-w-md">
         <p className="text-sm text-muted-foreground">Installation lancée. Votre garantie de 3 mois commence aujourd’hui.</p>
-        <WarrantyForm serial={d.serial ?? undefined} />
+        <WarrantyForm serial={d.serial} />
       </div>
     </main>
   );
