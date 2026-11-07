@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
       { title: "VCAMPRO INSTALLER — Téléchargez vos fichiers avec un code" },
       { name: "description", content: "Saisissez votre code à usage unique pour télécharger les fichiers partagés avec vous." },
       { property: "og:title", content: "VCAMPRO INSTALLER — Téléchargez vos fichiers avec un code" },
-      { property: "og:description", content: "Codes à usage unique valables pendant 10 minutes." },
+      { property: "og:description", content: "Codes à usage unique valables pendant 20 minutes." },
       { property: "og:site_name", content: "VCAMPRO INSTALLER" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -83,7 +83,7 @@ function Index() {
     await open(code);
   }
 
-  // Keep the session across reloads until the code's 10 minutes are over.
+  // Keep the session across reloads until the code's 20 minutes are over.
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
@@ -188,7 +188,7 @@ function Index() {
                 <span aria-hidden className="wordmark-dash-right h-0.5 w-7 rounded-full" />
               </div>
               <p className="mt-4 text-xs text-muted-foreground">
-                Chaque code reste valable 10 minutes, puis expire définitivement.
+                Chaque code reste valable 20 minutes, puis expire définitivement.
               </p>
             </div>
 
@@ -246,7 +246,7 @@ function Index() {
             <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">3. Fichiers disponibles</h2>
               <p className="text-sm text-muted-foreground">
-                Votre code reste valable pendant toute la durée de la session (10 minutes), puis il expire.
+                Votre code reste valable pendant toute la durée de la session (20 minutes), puis il expire.
               </p>
               <ul className="divide-y divide-border border-y border-border">
                 {files.map((f) => (

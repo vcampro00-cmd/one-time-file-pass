@@ -162,7 +162,7 @@ function Painel() {
           <div className="lock-card p-4 sm:p-6">
             <h2 className="mb-1 text-xl font-bold">Générer un code</h2>
             <p className="mb-4 text-sm text-muted-foreground">
-              {selected.size} fichier(s) sélectionné(s). Usage unique, valable 10 minutes.
+              {selected.size} fichier(s) sélectionné(s). Usage unique, valable 20 minutes.
             </p>
             <Button
               type="button"

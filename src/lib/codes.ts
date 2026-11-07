@@ -1,5 +1,5 @@
 // Shared rules for one-time download passwords.
-export const CODE_TTL_MINUTES = 10;
+export const CODE_TTL_MINUTES = 20;
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
 export const CODE_LENGTH = 8;
 

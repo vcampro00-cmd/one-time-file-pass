@@ -18,9 +18,9 @@ export const Route = createFileRoute("/achat/retour")({
     meta: [
       { name: "robots", content: "noindex, follow" },
       { title: "Votre code — VCAMPRO INSTALLER" },
-      { name: "description", content: "Votre code d’accès acheté, valable 10 minutes." },
+      { name: "description", content: "Votre code d’accès acheté, valable 20 minutes." },
       { property: "og:title", content: "Votre code — VCAMPRO INSTALLER" },
-      { property: "og:description", content: "Code d’accès à usage unique valable 10 minutes." },
+      { property: "og:description", content: "Code d’accès à usage unique valable 20 minutes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
