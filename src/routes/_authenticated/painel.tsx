@@ -3,13 +3,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, KeyRound, LogOut, Settings2, Smartphone, Trash2, Upload } from "lucide-react";
+import { Copy, KeyRound, LogOut, Settings2, Smartphone, Trash2, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/brand-logo";
 import { DevicesPanel } from "@/components/devices-panel";
 import { CustomerStepsPanel } from "@/components/customer-steps-panel";
+import { ResellersPanel } from "@/components/resellers-panel";
 import { supabase } from "@/integrations/supabase/client";
 import { createAccessCode } from "@/lib/codes.functions";
 import { codeStatus, formatCode } from "@/lib/codes";
@@ -48,7 +49,7 @@ function Painel() {
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [latest, setLatest] = useState<{ code: string; expiresAt: string } | null>(null);
-  const [view, setView] = useState<"devices" | "codes" | "settings">("devices");
+  const [view, setView] = useState<"devices" | "codes" | "resellers" | "settings">("devices");
   const now = useNow();
 
   const files = useQuery({
@@ -142,10 +143,12 @@ function Painel() {
         <nav className="flex flex-wrap gap-2 border-b border-border py-5" aria-label="Sections du tableau de bord">
           <Button variant={view === "devices" ? "brand" : "ghost"} aria-pressed={view === "devices"} onClick={() => setView("devices")}><Smartphone /> Appareils</Button>
           <Button variant={view === "codes" ? "brand" : "ghost"} aria-pressed={view === "codes"} onClick={() => setView("codes")}><KeyRound /> Générateur de codes</Button>
+          <Button variant={view === "resellers" ? "brand" : "ghost"} aria-pressed={view === "resellers"} onClick={() => setView("resellers")}><Users /> Revendeurs</Button>
           <Button variant={view === "settings" ? "brand" : "ghost"} aria-pressed={view === "settings"} onClick={() => setView("settings")}><Settings2 /> Affichage client</Button>
         </nav>
         {view === "devices" && <DevicesPanel />}
         {view === "settings" && <CustomerStepsPanel />}
+        {view === "resellers" && <ResellersPanel />}
         <div hidden={view !== "codes"}>
         <h1 className="py-6 text-2xl font-bold">Générateur de codes</h1>
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
