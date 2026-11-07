@@ -37,7 +37,7 @@ function parseXml(xml: string): Record<string, string> {
 
 function parseBinary(raw: Uint8Array): Record<string, string> {
   const dv = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
-  const t = b.length - 32;
+  const t = raw.length - 32;
   const offSize = raw[t + 6]!, refSize = raw[t + 7]!;
   const numObj = Number(dv.getBigUint64(t + 8)), top = Number(dv.getBigUint64(t + 16));
   const tableOff = Number(dv.getBigUint64(t + 24));
