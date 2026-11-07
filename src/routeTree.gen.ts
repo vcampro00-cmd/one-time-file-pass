@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AppareilRouteImport } from './routes/appareil'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LicencesRouteImport } from './routes/licences'
 import { Route as LicencesConnexionRouteImport } from './routes/licences-connexion'
@@ -18,10 +19,14 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_authenticated/gestion-licences'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AchatRetourRouteImport } from './routes/achat.retour'
+import { Route as AppareilTokenRouteImport } from './routes/appareil.$token'
 import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
 import { Route as ApiPublicLicensesVerifyRouteImport } from './routes/api/public/licenses/verify'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicUdidCallbackRouteImport } from './routes/api/public/udid/callback'
+import { Route as ApiPublicUdidManifestRouteImport } from './routes/api/public/udid/manifest'
+import { Route as ApiPublicUdidProfileRouteImport } from './routes/api/public/udid/profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppareilRoute = AppareilRouteImport.update({
+  id: '/appareil',
+  path: '/appareil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -68,6 +78,11 @@ const AchatRetourRoute = AchatRetourRouteImport.update({
   path: '/achat/retour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppareilTokenRoute = AppareilTokenRouteImport.update({
+  id: '/$token',
+  path: '/$token',
+  getParentRoute: () => AppareilRoute,
+} as any)
 const LicencesRetourRoute = LicencesRetourRouteImport.update({
   id: '/licences_/retour',
   path: '/licences/retour',
@@ -89,9 +104,25 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicUdidCallbackRoute = ApiPublicUdidCallbackRouteImport.update({
+  id: '/api/public/udid/callback',
+  path: '/api/public/udid/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicUdidManifestRoute = ApiPublicUdidManifestRouteImport.update({
+  id: '/api/public/udid/manifest',
+  path: '/api/public/udid/manifest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicUdidProfileRoute = ApiPublicUdidProfileRouteImport.update({
+  id: '/api/public/udid/profile',
+  path: '/api/public/udid/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/appareil': typeof AppareilRouteWithChildren
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
@@ -99,13 +130,18 @@ export interface FileRoutesByFullPath {
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/appareil/$token': typeof AppareilTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/udid/callback': typeof ApiPublicUdidCallbackRoute
+  '/api/public/udid/manifest': typeof ApiPublicUdidManifestRoute
+  '/api/public/udid/profile': typeof ApiPublicUdidProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/appareil': typeof AppareilRouteWithChildren
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
@@ -113,15 +149,20 @@ export interface FileRoutesByTo {
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/appareil/$token': typeof AppareilTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/udid/callback': typeof ApiPublicUdidCallbackRoute
+  '/api/public/udid/manifest': typeof ApiPublicUdidManifestRoute
+  '/api/public/udid/profile': typeof ApiPublicUdidProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/appareil': typeof AppareilRouteWithChildren
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
@@ -129,15 +170,20 @@ export interface FileRoutesById {
   '/_authenticated/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
+  '/appareil/$token': typeof AppareilTokenRoute
   '/licences_/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/udid/callback': typeof ApiPublicUdidCallbackRoute
+  '/api/public/udid/manifest': typeof ApiPublicUdidManifestRoute
+  '/api/public/udid/profile': typeof ApiPublicUdidProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/appareil'
     | '/auth'
     | '/licences'
     | '/licences-connexion'
@@ -145,13 +191,18 @@ export interface FileRouteTypes {
     | '/gestion-licences'
     | '/painel'
     | '/achat/retour'
+    | '/appareil/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
+    | '/api/public/udid/callback'
+    | '/api/public/udid/manifest'
+    | '/api/public/udid/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/appareil'
     | '/auth'
     | '/licences'
     | '/licences-connexion'
@@ -159,14 +210,19 @@ export interface FileRouteTypes {
     | '/gestion-licences'
     | '/painel'
     | '/achat/retour'
+    | '/appareil/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
+    | '/api/public/udid/callback'
+    | '/api/public/udid/manifest'
+    | '/api/public/udid/profile'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/appareil'
     | '/auth'
     | '/licences'
     | '/licences-connexion'
@@ -174,15 +230,20 @@ export interface FileRouteTypes {
     | '/_authenticated/gestion-licences'
     | '/_authenticated/painel'
     | '/achat/retour'
+    | '/appareil/$token'
     | '/licences_/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
+    | '/api/public/udid/callback'
+    | '/api/public/udid/manifest'
+    | '/api/public/udid/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AppareilRoute: typeof AppareilRouteWithChildren
   AuthRoute: typeof AuthRoute
   LicencesRoute: typeof LicencesRoute
   LicencesConnexionRoute: typeof LicencesConnexionRoute
@@ -192,6 +253,9 @@ export interface RootRouteChildren {
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
   ApiPublicLicensesVerifyRoute: typeof ApiPublicLicensesVerifyRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicUdidCallbackRoute: typeof ApiPublicUdidCallbackRoute
+  ApiPublicUdidManifestRoute: typeof ApiPublicUdidManifestRoute
+  ApiPublicUdidProfileRoute: typeof ApiPublicUdidProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -208,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/appareil': {
+      id: '/appareil'
+      path: '/appareil'
+      fullPath: '/appareil'
+      preLoaderRoute: typeof AppareilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -259,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AchatRetourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/appareil/$token': {
+      id: '/appareil/$token'
+      path: '/$token'
+      fullPath: '/appareil/$token'
+      preLoaderRoute: typeof AppareilTokenRouteImport
+      parentRoute: typeof AppareilRoute
+    }
     '/licences_/retour': {
       id: '/licences_/retour'
       path: '/licences/retour'
@@ -287,6 +365,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/udid/callback': {
+      id: '/api/public/udid/callback'
+      path: '/api/public/udid/callback'
+      fullPath: '/api/public/udid/callback'
+      preLoaderRoute: typeof ApiPublicUdidCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/udid/manifest': {
+      id: '/api/public/udid/manifest'
+      path: '/api/public/udid/manifest'
+      fullPath: '/api/public/udid/manifest'
+      preLoaderRoute: typeof ApiPublicUdidManifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/udid/profile': {
+      id: '/api/public/udid/profile'
+      path: '/api/public/udid/profile'
+      fullPath: '/api/public/udid/profile'
+      preLoaderRoute: typeof ApiPublicUdidProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -303,9 +402,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AppareilRouteChildren {
+  AppareilTokenRoute: typeof AppareilTokenRoute
+}
+
+const AppareilRouteChildren: AppareilRouteChildren = {
+  AppareilTokenRoute: AppareilTokenRoute,
+}
+
+const AppareilRouteWithChildren = AppareilRoute._addFileChildren(
+  AppareilRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AppareilRoute: AppareilRouteWithChildren,
   AuthRoute: AuthRoute,
   LicencesRoute: LicencesRoute,
   LicencesConnexionRoute: LicencesConnexionRoute,
@@ -315,6 +427,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
   ApiPublicLicensesVerifyRoute: ApiPublicLicensesVerifyRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicUdidCallbackRoute: ApiPublicUdidCallbackRoute,
+  ApiPublicUdidManifestRoute: ApiPublicUdidManifestRoute,
+  ApiPublicUdidProfileRoute: ApiPublicUdidProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
