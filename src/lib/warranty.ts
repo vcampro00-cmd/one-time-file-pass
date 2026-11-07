@@ -1,4 +1,4 @@
-export const WARRANTY_MONTHS = 5;
+export const WARRANTY_MONTHS = 3;
 
 export function warrantyEnd(start: Date) {
   const d = new Date(start);

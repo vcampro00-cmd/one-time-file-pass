@@ -14,14 +14,14 @@ async function loadImage(src: string) {
   return { data: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight };
 }
 
-async function makePdf(name: string, imei: string) {
+async function makePdf(name: string, imei: string, idLabel = "Numéro IMEI") {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const red: [number, number, number] = [200, 20, 30];
   const start = new Date();
   const end = warrantyEnd(start);
   const fmt = (d: Date) => d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
-  const no = `VC-G-${start.getFullYear()}${String(start.getMonth() + 1).padStart(2, "0")}${String(start.getDate()).padStart(2, "0")}-${imei.slice(-6)}`;
+  const no = `VC-G-${start.getFullYear()}${String(start.getMonth() + 1).padStart(2, "0")}${String(start.getDate()).padStart(2, "0")}-${imei.slice(-6).toUpperCase()}`;
 
   doc.setFillColor(12, 12, 14); doc.rect(0, 0, 210, 48, "F");
   doc.setFillColor(...red); doc.rect(0, 48, 210, 1.5, "F");
@@ -44,7 +44,7 @@ async function makePdf(name: string, imei: string) {
     y += 20;
   };
   row("Nom du client", name);
-  row("Numéro IMEI", imei);
+  row(idLabel, imei);
   row("Date de la garantie", fmt(start));
   row(`Validité (${WARRANTY_MONTHS} mois)`, `Jusqu’au ${fmt(end)}`);
 
@@ -54,7 +54,7 @@ async function makePdf(name: string, imei: string) {
   doc.text("Observation", 26, y + 9);
   doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(40, 40, 40);
   doc.text(doc.splitTextToSize(
-    "La garantie couvre uniquement la programmation. Si la programmation cesse de fonctionner pendant la période de validité, VCAMPRO INSTALLER s’engage à la refaire gratuitement, sur présentation de ce certificat PDF. La reprise gratuite n’est effectuée que sur présentation de ce PDF et si le numéro IMEI de l’appareil correspond à celui indiqué ci-dessus.",
+    `La garantie couvre uniquement la programmation. Si la programmation cesse de fonctionner pendant la période de validité, VCAMPRO INSTALLER s’engage à la refaire gratuitement, sur présentation de ce certificat PDF. La reprise gratuite n’est effectuée que sur présentation de ce PDF et si le ${idLabel === "Numéro IMEI" ? "numéro IMEI" : "numéro de série"} de l’appareil correspond à celui indiqué ci-dessus.`,
     158), 26, y + 17);
 
   // Stamp
@@ -124,7 +124,7 @@ function ImeiHelp() {
   );
 }
 
-export function WarrantyForm() {
+export function WarrantyForm({ serial }: { serial?: string | null } = {}) {
   const [name, setName] = useState("");
   const [imei, setImei] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -135,6 +135,11 @@ export function WarrantyForm() {
     const n = name.trim();
     const i = imei.replace(/\s/g, "");
     if (n.length < 2 || n.length > 80) return setError("Indiquez votre nom complet.");
+    if (serial) {
+      setError(null); setBusy(true);
+      try { await makePdf(n, serial, "Numéro de série"); } finally { setBusy(false); }
+      return;
+    }
     if (!isValidImei(i)) return setError("Numéro IMEI invalide (15 chiffres, *#06#).");
     setError(null); setBusy(true);
     try { await makePdf(n, i); } finally { setBusy(false); }
@@ -143,11 +148,15 @@ export function WarrantyForm() {
   const input = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent";
   return (
     <form onSubmit={submit} className="access-step space-y-3 py-6">
-      <h2 className="text-lg font-bold">5. Remplir la garantie</h2>
+      <h2 className="text-lg font-bold">{serial ? "Votre garantie" : "5. Remplir la garantie"}</h2>
       <p className="text-sm text-muted-foreground">Garantie de {WARRANTY_MONTHS} mois à partir d’aujourd’hui. Conservez le PDF.</p>
       <input className={input} placeholder="Nom complet" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="Nom complet" />
+      {serial ? (
+        <input className={`${input} font-mono opacity-80`} value={serial} readOnly aria-label="Numéro de série" />
+      ) : (<>
       <input className={`${input} font-mono`} placeholder="IMEI (composez *#06#)" inputMode="numeric" value={imei} maxLength={17} onChange={(e) => setImei(e.target.value.replace(/[^\d ]/g, ""))} aria-label="Numéro IMEI" />
       <ImeiHelp />
+      </>)}
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" variant="brand" disabled={busy} className="h-11 w-full font-mono text-xs font-bold uppercase">
         <FileCheck2 className="h-4 w-4" /> Générer le certificat PDF

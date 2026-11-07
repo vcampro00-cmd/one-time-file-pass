@@ -20,6 +20,7 @@ import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_auth
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AchatRetourRouteImport } from './routes/achat.retour'
 import { Route as AppareilTokenRouteImport } from './routes/appareil.$token'
+import { Route as GarantieTokenRouteImport } from './routes/garantie.$token'
 import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
 import { Route as ApiPublicLicensesVerifyRouteImport } from './routes/api/public/licenses/verify'
@@ -83,6 +84,11 @@ const AppareilTokenRoute = AppareilTokenRouteImport.update({
   path: '/$token',
   getParentRoute: () => AppareilRoute,
 } as any)
+const GarantieTokenRoute = GarantieTokenRouteImport.update({
+  id: '/garantie/$token',
+  path: '/garantie/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LicencesRetourRoute = LicencesRetourRouteImport.update({
   id: '/licences_/retour',
   path: '/licences/retour',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/garantie/$token': typeof GarantieTokenRoute
   '/licences_/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/garantie/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/garantie/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/garantie/$token'
     | '/licences_/retour'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   LicencesConnexionRoute: typeof LicencesConnexionRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
+  GarantieTokenRoute: typeof GarantieTokenRoute
   LicencesRetourRoute: typeof LicencesRetourRoute
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
   ApiPublicLicensesVerifyRoute: typeof ApiPublicLicensesVerifyRoute
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppareilTokenRouteImport
       parentRoute: typeof AppareilRoute
     }
+    '/garantie/$token': {
+      id: '/garantie/$token'
+      path: '/garantie/$token'
+      fullPath: '/garantie/$token'
+      preLoaderRoute: typeof GarantieTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/licences_/retour': {
       id: '/licences_/retour'
       path: '/licences/retour'
@@ -423,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   LicencesConnexionRoute: LicencesConnexionRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
+  GarantieTokenRoute: GarantieTokenRoute,
   LicencesRetourRoute: LicencesRetourRoute,
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
   ApiPublicLicensesVerifyRoute: ApiPublicLicensesVerifyRoute,
