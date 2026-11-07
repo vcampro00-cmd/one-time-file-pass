@@ -29,6 +29,11 @@ export function DevicesPanel() {
         <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Lien copié"); }}>
           <Copy /> Copier le lien « Certifier l'appareil »
         </Button>
+        <Button size="sm" variant="outline" asChild>
+          <a href="https://maplesign.ca" target="_blank" rel="noreferrer">
+            <ExternalLink /> Ouvrir MapleSign
+          </a>
+        </Button>
       </div>
       <ul className="divide-y divide-border border-y border-border">
         {devices.data?.map((d) => <DeviceRow key={d.id} d={d} onChange={() => qc.invalidateQueries({ queryKey: ["devices"] })} />)}
