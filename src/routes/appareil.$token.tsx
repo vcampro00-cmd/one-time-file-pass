@@ -8,6 +8,15 @@ import { getDevice } from "@/lib/devices.functions";
 export const Route = createFileRoute("/appareil/$token")({
   staticData: { sitemap: false },
   ssr: false,
+  head: () => ({ meta: [
+    { title: "Appareil certifié — VCAMPRO INSTALLER" },
+    { name: "description", content: "Confirmation de votre appareil et disponibilité de l'installation VCAMPRO." },
+    { name: "robots", content: "noindex" },
+    { property: "og:title", content: "Appareil certifié — VCAMPRO INSTALLER" },
+    { property: "og:description", content: "Votre installation VCAMPRO sera disponible sur cette page." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: DevicePage,
 });
 
@@ -36,7 +45,7 @@ function DevicePage() {
         <h1 className="flex items-center gap-2 text-xl font-bold"><Check className="text-primary" /> Appareil certifié</h1>
       </div>
       <div className="access-step space-y-3 py-6">
-        <h2 className="text-lg font-bold">Installation</h2>
+        {d.ready && <h2 className="text-lg font-bold">Installation</h2>}
         {d.ready ? (
           <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
             <a href={`itms-services://?action=download-manifest&url=${encodeURIComponent(manifest)}`}>
@@ -44,7 +53,7 @@ function DevicePage() {
             </a>
           </Button>
         ) : (
-          <p className="text-sm text-muted-foreground">Certification en cours. Gardez cette page : le bouton d'installation apparaîtra ici automatiquement.</p>
+          <p className="text-sm text-muted-foreground">Veuillez patienter. Votre application apparaîtra ici dès qu'elle sera prête à être installée.</p>
         )}
       </div>
     </div>
