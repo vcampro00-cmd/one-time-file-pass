@@ -29,6 +29,13 @@
       "when": 1794085902143,
       "tag": "0003_device_certification",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794089437641,
+      "tag": "0004_customer_step_visibility",
+      "breakpoints": true
     }
   ]
 }

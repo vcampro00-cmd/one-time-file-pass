@@ -98,6 +98,30 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_steps: {
+        Row: {
+          dns: boolean
+          files: boolean
+          id: boolean
+          link: boolean
+          warranty: boolean
+        }
+        Insert: {
+          dns?: boolean
+          files?: boolean
+          id?: boolean
+          link?: boolean
+          warranty?: boolean
+        }
+        Update: {
+          dns?: boolean
+          files?: boolean
+          id?: boolean
+          link?: boolean
+          warranty?: boolean
+        }
+        Relationships: []
+      }
       devices: {
         Row: {
           app_name: string | null
@@ -143,6 +167,18 @@ export type Database = {
           serial?: string | null
           token?: string
           udid?: string
+        }
+        Relationships: []
+      }
+      download_operators: {
+        Row: {
+          user_id: string
+        }
+        Insert: {
+          user_id: string
+        }
+        Update: {
+          user_id?: string
         }
         Relationships: []
       }
