@@ -1,0 +1,1 @@
+ALTER TABLE public.devices ADD COLUMN cancelled_at timestamptz;
