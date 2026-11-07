@@ -22,6 +22,13 @@
       "when": 1793284903454,
       "tag": "0002_separate_vcampro_licensing",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794085902143,
+      "tag": "0003_device_certification",
+      "breakpoints": true
     }
   ]
 }

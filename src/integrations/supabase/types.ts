@@ -98,6 +98,54 @@ export type Database = {
         }
         Relationships: []
       }
+      devices: {
+        Row: {
+          app_name: string | null
+          app_version: string | null
+          bundle_id: string | null
+          created_at: string
+          id: string
+          ios_version: string | null
+          ipa_path: string | null
+          label: string | null
+          product: string | null
+          ready_at: string | null
+          serial: string | null
+          token: string
+          udid: string
+        }
+        Insert: {
+          app_name?: string | null
+          app_version?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          ios_version?: string | null
+          ipa_path?: string | null
+          label?: string | null
+          product?: string | null
+          ready_at?: string | null
+          serial?: string | null
+          token: string
+          udid: string
+        }
+        Update: {
+          app_name?: string | null
+          app_version?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          ios_version?: string | null
+          ipa_path?: string | null
+          label?: string | null
+          product?: string | null
+          ready_at?: string | null
+          serial?: string | null
+          token?: string
+          udid?: string
+        }
+        Relationships: []
+      }
       files: {
         Row: {
           created_at: string
