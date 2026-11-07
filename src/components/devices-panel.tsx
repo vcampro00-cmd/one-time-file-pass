@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { readIpaInfo } from "@/lib/ipa-info";
 import { deviceStatus, type DeviceStatus } from "@/lib/device-status";
 
-type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; ready_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string };
+type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string };
 
 const filters: { value: DeviceStatus; label: string }[] = [
   { value: "certified", label: "Certifiés" },
@@ -23,7 +23,7 @@ export function DevicesPanel() {
   const devices = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, ready_at, cancelled_at, app_name, created_at").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, cancelled_at, app_name, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       return data as Row[];
     },
@@ -100,7 +100,7 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
   return (
     <li className="space-y-3 py-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")} · {d.product} · iOS {d.ios_version}</span>
+        <span className="font-mono text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")} · {d.product} · iOS {d.ios_version}{d.serial ? ` · Série ${d.serial}` : ""}</span>
         <Badge variant={deviceStatus(d) === "certified" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
         <Button size="icon" variant="ghost" className="ml-auto" asChild aria-label="Ouvrir la page client"><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>
         <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}>{d.cancelled_at ? <RotateCcw /> : <Ban />}{d.cancelled_at ? "Réactiver" : "Annuler"}</Button>
