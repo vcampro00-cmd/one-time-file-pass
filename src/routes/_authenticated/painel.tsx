@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/brand-logo";
+import { DevicesPanel } from "@/components/devices-panel";
 import { supabase } from "@/integrations/supabase/client";
 import { createAccessCode } from "@/lib/codes.functions";
 import { codeStatus, formatCode } from "@/lib/codes";
@@ -216,6 +217,7 @@ function Painel() {
           </div>
         </section>
       </div>
+      <div className="px-4"><DevicesPanel /></div>
     </main>
   );
 }
