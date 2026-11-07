@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Check, Download, Loader2 } from "lucide-react";
@@ -25,6 +25,7 @@ type Device = Awaited<ReturnType<typeof getDevice>>;
 function DevicePage() {
   const { token } = Route.useParams();
   const fetchDevice = useServerFn(getDevice);
+  const navigate = useNavigate();
   const [d, setD] = useState<Device | undefined>(undefined);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ function DevicePage() {
         {d.ready && <h2 className="text-lg font-bold">Installation</h2>}
         {d.ready ? (
           <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
-            <a href={`itms-services://?action=download-manifest&url=${encodeURIComponent(manifest)}`}>
+            <a onClick={() => setTimeout(() => navigate({ to: "/garantie/$token", params: { token } }), 1500)} href={`itms-services://?action=download-manifest&url=${encodeURIComponent(manifest)}`}>
               <Download className="h-4 w-4" /> Installer {d.appName ?? "VCAMPRO"} (1 clic)
             </a>
           </Button>
