@@ -64,6 +64,13 @@
       "when": 1794092897062,
       "tag": "0008_reseller_credit_panel",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794093085240,
+      "tag": "0009_reseller_login",
+      "breakpoints": true
     }
   ]
 }

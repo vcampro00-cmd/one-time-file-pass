@@ -279,6 +279,35 @@ export type Database = {
           },
         ]
       }
+      reseller_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          reseller_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          reseller_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          reseller_id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_sessions_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resellers: {
         Row: {
           access_key_hash: string
@@ -287,6 +316,8 @@ export type Database = {
           credits: number
           id: string
           name: string
+          password_hash: string | null
+          username: string | null
         }
         Insert: {
           access_key_hash: string
@@ -295,6 +326,8 @@ export type Database = {
           credits?: number
           id?: string
           name: string
+          password_hash?: string | null
+          username?: string | null
         }
         Update: {
           access_key_hash?: string
@@ -303,6 +336,8 @@ export type Database = {
           credits?: number
           id?: string
           name?: string
+          password_hash?: string | null
+          username?: string | null
         }
         Relationships: []
       }
@@ -387,6 +422,15 @@ export type Database = {
           _expires: string
           _key_hash: string
           _label: string
+          _token: string
+        }
+        Returns: number
+      }
+      consume_reseller_credit_for: {
+        Args: {
+          _expires: string
+          _label: string
+          _reseller: string
           _token: string
         }
         Returns: number
