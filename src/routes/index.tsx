@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Download, ExternalLink, Loader2, ShieldCheck, Smartphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { isCodeComplete, maskCode } from "@/lib/codes";
 import { BuyCode } from "@/components/buy-code";
 import { RecoverCode } from "@/components/recover-code";
 import { WarrantyForm } from "@/components/warranty-form";
+import { customerStepsQuery, DEFAULT_CUSTOMER_STEPS } from "@/lib/customer-steps";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -38,6 +40,10 @@ type FileLink = { id: string; name: string; size: number; url: string };
 const SESSION_KEY = "vcampro:session";
 
 function Index() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const settings = useQuery({ ...customerStepsQuery, enabled: hydrated });
+  const visible = settings.data ?? DEFAULT_CUSTOMER_STEPS;
   const redeem = useServerFn(redeemAccessCode);
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -206,7 +212,7 @@ function Index() {
             )}
 
             {/* Step 1: DNS profile, step by step */}
-            <div className="access-step space-y-3 py-6">
+            {visible.dns && <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">1. Profil DNS</h2>
               <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
                 <li>Ouvrez cette page dans Safari sur votre iPhone.</li>
@@ -226,13 +232,15 @@ function Index() {
               )}
             </div>
 
+            }
+
             {/* Step 2: device certification (UDID) */}
             <div className="access-step space-y-3 py-6">
-              <h2 className="text-lg font-bold">2. Certifier l'appareil</h2>
+              <h2 className="text-lg font-bold">Certifier l'appareil</h2>
               <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
                 <li>Appuyez sur « Certifier l'appareil » puis sur « Autoriser ».</li>
                 <li>Ouvrez Réglages › Profil téléchargé › Installer.</li>
-                <li>Vous arrivez sur une page avec votre identifiant : gardez-la, le bouton d'installation y apparaîtra.</li>
+                <li>Votre appareil sera identifié. Gardez la page de confirmation : l'application y apparaîtra dès qu'elle sera prête.</li>
               </ol>
               <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
                 <a href="/api/public/udid/profile">
@@ -242,7 +250,7 @@ function Index() {
             </div>
 
             {/* Step 3: link */}
-            <div className="access-step space-y-3 py-6">
+            {visible.link && <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">3. Lien</h2>
               <p className="text-sm text-muted-foreground">Appuyez sur le lien ci-dessous.</p>
               <Button asChild variant="outline" className="h-11 w-full text-accent">
@@ -257,8 +265,10 @@ function Index() {
               </Button>
             </div>
 
-            {/* Step 3: files */}
-            <div className="access-step space-y-3 py-6">
+            }
+
+            {/* Step 4: files */}
+            {visible.files && <div className="access-step space-y-3 py-6">
               <h2 className="text-lg font-bold">4. Fichiers disponibles</h2>
               <p className="text-sm text-muted-foreground">
                 Votre code reste valable pendant toute la durée de la session (20 minutes), puis il expire.
@@ -281,7 +291,9 @@ function Index() {
               </ul>
             </div>
 
-            <WarrantyForm />
+            }
+
+            {visible.warranty && <WarrantyForm />}
           </div>
         )}
       </section>
