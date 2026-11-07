@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Check, Copy, Download, Loader2 } from "lucide-react";
+import { Check, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDevice } from "@/lib/devices.functions";
 
@@ -17,7 +17,6 @@ function DevicePage() {
   const { token } = Route.useParams();
   const fetchDevice = useServerFn(getDevice);
   const [d, setD] = useState<Device | undefined>(undefined);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -34,12 +33,7 @@ function DevicePage() {
   return (
     <div className="space-y-4">
       <div className="access-step space-y-3 py-6">
-        <h1 className="text-xl font-bold">Appareil enregistré</h1>
-        <p className="text-sm text-muted-foreground">{d.product} · iOS {d.iosVersion}</p>
-        <p className="break-all font-mono text-sm">{d.udid}</p>
-        <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(d.udid); setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
-          {copied ? <Check /> : <Copy />} {copied ? "Copié !" : "Copier l'UDID"}
-        </Button>
+        <h1 className="flex items-center gap-2 text-xl font-bold"><Check className="text-primary" /> Appareil certifié</h1>
       </div>
       <div className="access-step space-y-3 py-6">
         <h2 className="text-lg font-bold">Installation</h2>
