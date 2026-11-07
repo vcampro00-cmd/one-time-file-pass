@@ -43,6 +43,13 @@
       "when": 1794089625248,
       "tag": "0005_device_cancellation_status",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794090177804,
+      "tag": "0006_restrict_devices_and_steps_policies",
+      "breakpoints": true
     }
   ]
 }
