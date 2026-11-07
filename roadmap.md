@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Organize administrator workspace into devices, code generator and customer settings; certified/pending/cancelled filters, cancellation/reactivation persistence, blocked cancelled manifest/client view and actual code generation verified with owner session. Eleven tests passed; desktop/mobile checked without runtime errors. No publishing performed.
+
 - [x] Default customer view to certification only; persistent owner switches for DNS/link/files/warranty verified across reload and public client view; pending device shows certification confirmation and waiting message without UDID. Six tests passed; desktop/mobile checked. No publishing or real-iPhone profile installation performed.
 
 - [x] Redesign existing website presentation in black/red cybersecurity style, preserve logo shape and all content/flows; desktop/mobile home, unlock, login, licences and authenticated panels verified without overflow or runtime errors. 19 regression tests passed; no publishing or backend changes.

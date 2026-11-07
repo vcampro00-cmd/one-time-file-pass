@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildManifest, httpsOrigin } from "@/lib/udid";
+import { canInstallDevice } from "@/lib/device-status";
 
 export const Route = createFileRoute("/api/public/udid/manifest")({
   staticData: { sitemap: false },
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/api/public/udid/manifest")({
         if (!/^[0-9a-f]{48}$/.test(t)) return new Response("Not found", { status: 404 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: d } = await supabaseAdmin.from("devices").select("*").eq("token", t).maybeSingle();
-        if (!d?.ipa_path || !d.ready_at) return new Response("Not found", { status: 404 });
+        if (!d || !canInstallDevice(d) || !d.ipa_path) return new Response("Not found", { status: 404 });
         const { data: signed } = await supabaseAdmin.storage.from("files").createSignedUrl(d.ipa_path, 3600);
         if (!signed) return new Response("Not found", { status: 404 });
         return new Response(

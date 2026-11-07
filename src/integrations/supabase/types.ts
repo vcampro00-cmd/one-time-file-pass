@@ -127,6 +127,7 @@ export type Database = {
           app_name: string | null
           app_version: string | null
           bundle_id: string | null
+          cancelled_at: string | null
           created_at: string
           id: string
           ios_version: string | null
@@ -142,6 +143,7 @@ export type Database = {
           app_name?: string | null
           app_version?: string | null
           bundle_id?: string | null
+          cancelled_at?: string | null
           created_at?: string
           id?: string
           ios_version?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           app_name?: string | null
           app_version?: string | null
           bundle_id?: string | null
+          cancelled_at?: string | null
           created_at?: string
           id?: string
           ios_version?: string | null
