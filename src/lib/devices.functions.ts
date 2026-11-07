@@ -15,5 +15,5 @@ export const getDevice = createServerFn({ method: "POST" })
       .eq("token", data.token)
       .maybeSingle();
     if (!d) return null;
-    return { udid: d.udid, product: d.product, iosVersion: d.ios_version, appName: d.app_name, ready: !!(d.ready_at && d.ipa_path) };
+    return { appName: d.app_name, ready: !!(d.ready_at && d.ipa_path) };
   });
