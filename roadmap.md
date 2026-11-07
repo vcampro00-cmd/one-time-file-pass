@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Default customer view to certification only; add persistent owner switches for DNS/link/files, keep certification confirmation and pending-install message without UDID, and verify owner/customer flow.
+
 - [x] Redesign existing website presentation in black/red cybersecurity style, preserve logo shape and all content/flows; desktop/mobile home, unlock, login, licences and authenticated panels verified without overflow or runtime errors. 19 regression tests passed; no publishing or backend changes.
 
 - [x] Build separate licensing purchase, owner login and management screens; 15 €/7 days and 60 €/30 days, manual renewals; creation, suspension, reactivation and customer lookup verified with owner session. Existing download panel untouched. Tests passing.
