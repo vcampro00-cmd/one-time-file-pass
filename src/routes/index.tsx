@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Download, ExternalLink, Loader2, ShieldCheck, Upload } from "lucide-react";
+import { Download, ExternalLink, Loader2, ShieldCheck, Smartphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { redeemAccessCode } from "@/lib/codes.functions";
@@ -226,9 +226,24 @@ function Index() {
               )}
             </div>
 
-            {/* Step 2: link */}
+            {/* Step 2: device certification (UDID) */}
             <div className="access-step space-y-3 py-6">
-              <h2 className="text-lg font-bold">2. Lien</h2>
+              <h2 className="text-lg font-bold">2. Certifier l'appareil</h2>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                <li>Appuyez sur « Certifier l'appareil » puis sur « Autoriser ».</li>
+                <li>Ouvrez Réglages › Profil téléchargé › Installer.</li>
+                <li>Vous arrivez sur une page avec votre identifiant : gardez-la, le bouton d'installation y apparaîtra.</li>
+              </ol>
+              <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
+                <a href="/api/public/udid/profile">
+                  <Smartphone className="h-4 w-4" /> Certifier l'appareil
+                </a>
+              </Button>
+            </div>
+
+            {/* Step 3: link */}
+            <div className="access-step space-y-3 py-6">
+              <h2 className="text-lg font-bold">3. Lien</h2>
               <p className="text-sm text-muted-foreground">Appuyez sur le lien ci-dessous.</p>
               <Button asChild variant="outline" className="h-11 w-full text-accent">
               <a
@@ -244,7 +259,7 @@ function Index() {
 
             {/* Step 3: files */}
             <div className="access-step space-y-3 py-6">
-              <h2 className="text-lg font-bold">3. Fichiers disponibles</h2>
+              <h2 className="text-lg font-bold">4. Fichiers disponibles</h2>
               <p className="text-sm text-muted-foreground">
                 Votre code reste valable pendant toute la durée de la session (20 minutes), puis il expire.
               </p>
