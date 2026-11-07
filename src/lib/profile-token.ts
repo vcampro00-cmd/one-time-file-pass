@@ -1,7 +1,7 @@
 // Short-lived signed token that unlocks the profile download after a valid code was entered.
 // Format: "<expiresAtMs>.<hex hmac-sha256>". Works in the Worker runtime (Web Crypto only).
 
-export const PROFILE_TOKEN_TTL_MS = 10 * 60 * 1000;
+export const PROFILE_TOKEN_TTL_MS = 20 * 60 * 1000;
 
 async function hmac(secret: string, message: string): Promise<string> {
   const key = await crypto.subtle.importKey(
