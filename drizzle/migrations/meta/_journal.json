@@ -50,6 +50,13 @@
       "when": 1794090177804,
       "tag": "0006_restrict_devices_and_steps_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794092641574,
+      "tag": "0007_reseller_warranty_flag",
+      "breakpoints": true
     }
   ]
 }
