@@ -57,6 +57,13 @@
       "when": 1794092641574,
       "tag": "0007_reseller_warranty_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794092897062,
+      "tag": "0008_reseller_credit_panel",
+      "breakpoints": true
     }
   ]
 }

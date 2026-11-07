@@ -12,9 +12,9 @@ export const getDevice = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: d } = await supabaseAdmin
       .from("devices")
-      .select("app_name, serial, ready_at, ipa_path, cancelled_at")
+      .select("app_name, serial, ready_at, ipa_path, cancelled_at, reseller")
       .eq("token", data.token)
       .maybeSingle();
     if (!d) return null;
-    return { appName: d.app_name, serial: d.serial, ready: canInstallDevice(d), cancelled: !!d.cancelled_at };
+    return { appName: d.app_name, serial: d.serial, ready: canInstallDevice(d), cancelled: !!d.cancelled_at, reseller: d.reseller };
   });

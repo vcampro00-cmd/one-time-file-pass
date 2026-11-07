@@ -27,3 +27,4 @@
 - [ ] French VCAMPRO camera menu: VCAMPRO_Virtual_Camera_1.1.0.deb has French menu only for arm64 App Store apps; home screen/Apple apps stay Chinese. Blocked on a Mac with Apple's arm64e linker; waiting on owner test inside an App Store app.
 - [ ] VCAMPRO home-screen app: VCAMPRO_App_1.2.deb built (arm64: choose, preview, rotate 90°, mirror, disable; only edits temp.mov). Untested on iPhone; waiting on owner test.
 - [x] Device certification: /appareil captures UDID, owner panel lists devices and publishes signed IPA, client gets 1-click install. Real iPhone test pending after publish.
+- [x] Reseller panel with prepaid credits, QR/link certification (1 credit per device, 5-month warranty); owner manages resellers and credits in admin. Real iPhone scan pending.

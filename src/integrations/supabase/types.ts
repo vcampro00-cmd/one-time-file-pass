@@ -142,6 +142,7 @@ export type Database = {
           product: string | null
           ready_at: string | null
           reseller: boolean
+          reseller_id: string | null
           serial: string | null
           token: string
           udid: string
@@ -159,6 +160,7 @@ export type Database = {
           product?: string | null
           ready_at?: string | null
           reseller?: boolean
+          reseller_id?: string | null
           serial?: string | null
           token: string
           udid: string
@@ -176,11 +178,20 @@ export type Database = {
           product?: string | null
           ready_at?: string | null
           reseller?: boolean
+          reseller_id?: string | null
           serial?: string | null
           token?: string
           udid?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "devices_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       download_operators: {
         Row: {
@@ -230,6 +241,68 @@ export type Database = {
         }
         Update: {
           user_id?: string
+        }
+        Relationships: []
+      }
+      reseller_links: {
+        Row: {
+          created_at: string
+          expires_at: string
+          label: string | null
+          reseller_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          label?: string | null
+          reseller_id: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          label?: string | null
+          reseller_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_links_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resellers: {
+        Row: {
+          access_key_hash: string
+          active: boolean
+          created_at: string
+          credits: number
+          id: string
+          name: string
+        }
+        Insert: {
+          access_key_hash: string
+          active?: boolean
+          created_at?: string
+          credits?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          access_key_hash?: string
+          active?: boolean
+          created_at?: string
+          credits?: number
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -309,6 +382,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_reseller_credit: {
+        Args: {
+          _expires: string
+          _key_hash: string
+          _label: string
+          _token: string
+        }
+        Returns: number
+      }
       fulfill_vcampro_license: {
         Args: {
           p_code: string

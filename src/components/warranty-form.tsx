@@ -14,12 +14,12 @@ async function loadImage(src: string) {
   return { data: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight };
 }
 
-async function makePdf(name: string, imei: string, idLabel = "Numéro IMEI") {
+async function makePdf(name: string, imei: string, idLabel = "Numéro IMEI", months = WARRANTY_MONTHS) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const red: [number, number, number] = [200, 20, 30];
   const start = new Date();
-  const end = warrantyEnd(start);
+  const end = warrantyEnd(start, months);
   const fmt = (d: Date) => d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const no = `VC-G-${start.getFullYear()}${String(start.getMonth() + 1).padStart(2, "0")}${String(start.getDate()).padStart(2, "0")}-${imei.slice(-6).toUpperCase()}`;
 
@@ -46,7 +46,7 @@ async function makePdf(name: string, imei: string, idLabel = "Numéro IMEI") {
   row("Nom du client", name);
   row(idLabel, imei);
   row("Date de la garantie", fmt(start));
-  row(`Validité (${WARRANTY_MONTHS} mois)`, `Jusqu’au ${fmt(end)}`);
+  row(`Validité (${months} mois)`, `Jusqu’au ${fmt(end)}`);
 
   y += 4;
   doc.setFillColor(248, 240, 240); doc.setDrawColor(...red); doc.roundedRect(20, y, 170, 42, 2, 2, "FD");
@@ -124,7 +124,7 @@ function ImeiHelp() {
   );
 }
 
-export function WarrantyForm({ serial }: { serial?: string | null } = {}) {
+export function WarrantyForm({ serial, months = WARRANTY_MONTHS }: { serial?: string | null; months?: number } = {}) {
   const [name, setName] = useState("");
   const [imei, setImei] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -137,19 +137,19 @@ export function WarrantyForm({ serial }: { serial?: string | null } = {}) {
     if (n.length < 2 || n.length > 80) return setError("Indiquez votre nom complet.");
     if (serial) {
       setError(null); setBusy(true);
-      try { await makePdf(n, serial, "Numéro de série"); } finally { setBusy(false); }
+      try { await makePdf(n, serial, "Numéro de série", months); } finally { setBusy(false); }
       return;
     }
     if (!isValidImei(i)) return setError("Numéro IMEI invalide (15 chiffres, *#06#).");
     setError(null); setBusy(true);
-    try { await makePdf(n, i); } finally { setBusy(false); }
+    try { await makePdf(n, i, "Numéro IMEI", months); } finally { setBusy(false); }
   }
 
   const input = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent";
   return (
     <form onSubmit={submit} className="access-step space-y-3 py-6">
       <h2 className="text-lg font-bold">{serial ? "Votre garantie" : "5. Remplir la garantie"}</h2>
-      <p className="text-sm text-muted-foreground">Garantie de {WARRANTY_MONTHS} mois à partir d’aujourd’hui. Conservez le PDF.</p>
+      <p className="text-sm text-muted-foreground">Garantie de {months} mois à partir d’aujourd’hui. Conservez le PDF.</p>
       <input className={input} placeholder="Nom complet" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="Nom complet" />
       {serial ? (
         <input className={`${input} font-mono opacity-80`} value={serial} readOnly aria-label="Numéro de série" />

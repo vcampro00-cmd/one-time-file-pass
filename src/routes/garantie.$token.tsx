@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { getDevice } from "@/lib/devices.functions";
 import { WarrantyForm } from "@/components/warranty-form";
+import { RESELLER_WARRANTY_MONTHS, WARRANTY_MONTHS } from "@/lib/warranty";
 
 export const Route = createFileRoute("/garantie/$token")({
   staticData: { sitemap: false },
@@ -32,7 +33,7 @@ function WarrantyPage() {
     <main className="grid-paper flex min-h-screen justify-center px-4 pt-16">
       <div className="w-full max-w-md">
         <p className="text-sm text-muted-foreground">Installation lancée. Votre garantie de 3 mois commence aujourd’hui.</p>
-        <WarrantyForm serial={d.serial} />
+        <WarrantyForm serial={d.serial} months={d.reseller ? RESELLER_WARRANTY_MONTHS : WARRANTY_MONTHS} />
       </div>
     </main>
   );
