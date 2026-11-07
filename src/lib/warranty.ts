@@ -1,8 +1,10 @@
 export const WARRANTY_MONTHS = 3;
+// Resellers (50 € codes) get a longer warranty.
+export const RESELLER_WARRANTY_MONTHS = 5;
 
-export function warrantyEnd(start: Date) {
+export function warrantyEnd(start: Date, months = WARRANTY_MONTHS) {
   const d = new Date(start);
-  d.setMonth(d.getMonth() + WARRANTY_MONTHS);
+  d.setMonth(d.getMonth() + months);
   return d;
 }
 

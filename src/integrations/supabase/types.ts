@@ -51,6 +51,7 @@ export type Database = {
           expires_at: string
           id: string
           owner_id: string
+          reseller: boolean
           used_at: string | null
         }
         Insert: {
@@ -59,6 +60,7 @@ export type Database = {
           expires_at: string
           id?: string
           owner_id?: string
+          reseller?: boolean
           used_at?: string | null
         }
         Update: {
@@ -67,6 +69,7 @@ export type Database = {
           expires_at?: string
           id?: string
           owner_id?: string
+          reseller?: boolean
           used_at?: string | null
         }
         Relationships: []
@@ -78,6 +81,7 @@ export type Database = {
           created_at: string
           environment: string
           expires_at: string
+          reseller: boolean
           session_id: string
         }
         Insert: {
@@ -86,6 +90,7 @@ export type Database = {
           created_at?: string
           environment: string
           expires_at: string
+          reseller?: boolean
           session_id: string
         }
         Update: {
@@ -94,6 +99,7 @@ export type Database = {
           created_at?: string
           environment?: string
           expires_at?: string
+          reseller?: boolean
           session_id?: string
         }
         Relationships: []
@@ -135,6 +141,7 @@ export type Database = {
           label: string | null
           product: string | null
           ready_at: string | null
+          reseller: boolean
           serial: string | null
           token: string
           udid: string
@@ -151,6 +158,7 @@ export type Database = {
           label?: string | null
           product?: string | null
           ready_at?: string | null
+          reseller?: boolean
           serial?: string | null
           token: string
           udid: string
@@ -167,6 +175,7 @@ export type Database = {
           label?: string | null
           product?: string | null
           ready_at?: string | null
+          reseller?: boolean
           serial?: string | null
           token?: string
           udid?: string
