@@ -15,6 +15,7 @@ import { Route as AppareilRouteImport } from './routes/appareil'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LicencesRouteImport } from './routes/licences'
 import { Route as LicencesConnexionRouteImport } from './routes/licences-connexion'
+import { Route as RevendaRouteImport } from './routes/revenda'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_authenticated/gestion-licences'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
@@ -56,6 +57,11 @@ const LicencesRoute = LicencesRouteImport.update({
 const LicencesConnexionRoute = LicencesConnexionRouteImport.update({
   id: '/licences-connexion',
   path: '/licences-connexion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevendaRoute = RevendaRouteImport.update({
+  id: '/revenda',
+  path: '/revenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
+  '/revenda': typeof RevendaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
+  '/revenda': typeof RevendaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
+  '/revenda': typeof RevendaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/licences'
     | '/licences-connexion'
+    | '/revenda'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/licences'
     | '/licences-connexion'
+    | '/revenda'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/licences'
     | '/licences-connexion'
+    | '/revenda'
     | '/sitemap.xml'
     | '/_authenticated/gestion-licences'
     | '/_authenticated/painel'
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LicencesRoute: typeof LicencesRoute
   LicencesConnexionRoute: typeof LicencesConnexionRoute
+  RevendaRoute: typeof RevendaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
   GarantieTokenRoute: typeof GarantieTokenRoute
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/licences-connexion'
       fullPath: '/licences-connexion'
       preLoaderRoute: typeof LicencesConnexionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revenda': {
+      id: '/revenda'
+      path: '/revenda'
+      fullPath: '/revenda'
+      preLoaderRoute: typeof RevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -441,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LicencesRoute: LicencesRoute,
   LicencesConnexionRoute: LicencesConnexionRoute,
+  RevendaRoute: RevendaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
   GarantieTokenRoute: GarantieTokenRoute,
