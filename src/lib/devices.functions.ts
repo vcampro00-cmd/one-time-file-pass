@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { canInstallDevice } from "@/lib/device-status";
 
 // Public: the device page, reachable only with its unguessable token.
 export const getDevice = createServerFn({ method: "POST" })
@@ -11,9 +12,9 @@ export const getDevice = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: d } = await supabaseAdmin
       .from("devices")
-      .select("udid, product, ios_version, app_name, ready_at, ipa_path")
+      .select("app_name, ready_at, ipa_path, cancelled_at")
       .eq("token", data.token)
       .maybeSingle();
     if (!d) return null;
-    return { appName: d.app_name, ready: !!(d.ready_at && d.ipa_path) };
+    return { appName: d.app_name, ready: canInstallDevice(d), cancelled: !!d.cancelled_at };
   });

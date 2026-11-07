@@ -1,21 +1,29 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, ExternalLink, Trash2, Upload } from "lucide-react";
+import { Ban, Copy, ExternalLink, RotateCcw, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readIpaInfo } from "@/lib/ipa-info";
+import { deviceStatus, type DeviceStatus } from "@/lib/device-status";
 
-type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; ready_at: string | null; app_name: string | null; created_at: string };
+type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; ready_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string };
+
+const filters: { value: DeviceStatus; label: string }[] = [
+  { value: "certified", label: "Certifiés" },
+  { value: "pending", label: "En attente" },
+  { value: "cancelled", label: "Annulés" },
+];
 
 export function DevicesPanel() {
+  const [filter, setFilter] = useState<DeviceStatus>("certified");
   const qc = useQueryClient();
   const devices = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, ready_at, app_name, created_at").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, ready_at, cancelled_at, app_name, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       return data as Row[];
     },
@@ -24,11 +32,11 @@ export function DevicesPanel() {
   const link = `${typeof window !== "undefined" ? window.location.origin : ""}/appareil`;
 
   return (
-    <section className="lock-card mx-auto mb-16 max-w-5xl p-4 sm:p-6">
+    <section className="mx-auto max-w-5xl py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-bold">Appareils à certifier</h2>
+        <h2 className="mr-auto text-2xl font-bold">Appareils</h2>
         <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Lien copié"); }}>
-          <Copy /> Copier le lien « Certifier l'appareil »
+          <Copy /> Lien de certification
         </Button>
         <Button size="sm" variant="outline" asChild>
           <a href="https://kravasign.com" target="_blank" rel="noreferrer">
@@ -36,9 +44,16 @@ export function DevicesPanel() {
           </a>
         </Button>
       </div>
+      <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Statut des appareils">
+        {filters.map(({ value, label }) => <Button key={value} variant={filter === value ? "brand" : "outline"} aria-pressed={filter === value} onClick={() => setFilter(value)}>
+          {label} <span className="font-mono text-xs">{devices.data?.filter((d) => deviceStatus(d) === value).length ?? 0}</span>
+        </Button>)}
+      </div>
+      {devices.isError && <p role="alert" className="py-4 text-destructive">Impossible de charger les appareils.</p>}
       <ul className="divide-y divide-border border-y border-border">
-        {devices.data?.map((d) => <DeviceRow key={d.id} d={d} onChange={() => qc.invalidateQueries({ queryKey: ["devices"] })} />)}
-        {devices.data?.length === 0 && <li className="py-6 text-center text-sm text-muted-foreground">Aucun appareil pour le moment.</li>}
+        {devices.data?.filter((d) => deviceStatus(d) === filter).map((d) => <DeviceRow key={d.id} d={d} onChange={() => qc.invalidateQueries({ queryKey: ["devices"] })} />)}
+        {devices.isPending && <li className="py-10 text-center text-muted-foreground">Chargement…</li>}
+        {devices.data && !devices.data.some((d) => deviceStatus(d) === filter) && <li className="py-12 text-center text-sm text-muted-foreground">Aucun appareil dans cette catégorie.</li>}
       </ul>
     </section>
   );
@@ -61,7 +76,8 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
       return;
     }
     const { data: u } = await supabase.auth.getUser();
-    const path = `${u.user!.id}/devices/${d.id}/${crypto.randomUUID()}.ipa`;
+    if (!u.user) { toast.error("Veuillez vous reconnecter"); setBusy(false); return; }
+    const path = `${u.user.id}/devices/${d.id}/${crypto.randomUUID()}.ipa`;
     const { error } = await supabase.storage.from("files").upload(path, file, { contentType: "application/octet-stream" });
     if (!error) {
       const { error: e2 } = await supabase.from("devices").update({ ipa_path: path, app_name: name, bundle_id: bundle, app_version: version, ready_at: new Date().toISOString() }).eq("id", d.id);
@@ -71,8 +87,13 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
     onChange();
   }
 
-  async function remove() {
-    await supabase.from("devices").delete().eq("id", d.id);
+  async function changeCancellation() {
+    if (!d.cancelled_at && !window.confirm("Annuler cet appareil et désactiver son installation ?")) return;
+    setBusy(true);
+    const { error } = await supabase.from("devices").update({ cancelled_at: d.cancelled_at ? null : new Date().toISOString() }).eq("id", d.id).select("id").single();
+    setBusy(false);
+    if (error) { toast.error("Impossible de modifier le statut"); return; }
+    toast.success(d.cancelled_at ? "Appareil réactivé" : "Appareil annulé");
     onChange();
   }
 
@@ -80,19 +101,21 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
     <li className="space-y-3 py-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")} · {d.product} · iOS {d.ios_version}</span>
-        <Badge variant={d.ready_at ? "default" : "outline"}>{d.ready_at ? "prêt" : "en attente"}</Badge>
+        <Badge variant={deviceStatus(d) === "certified" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
         <Button size="icon" variant="ghost" className="ml-auto" asChild aria-label="Ouvrir la page client"><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>
-        <Button size="icon" variant="ghost" onClick={remove} aria-label="Supprimer"><Trash2 /></Button>
+        <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}>{d.cancelled_at ? <RotateCcw /> : <Ban />}{d.cancelled_at ? "Réactiver" : "Annuler"}</Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className="break-all font-mono text-sm">{d.udid}</span>
         <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(d.udid); toast.success("UDID copié"); }}><Copy /> Copier</Button>
       </div>
-      <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" />
+      {!d.cancelled_at && <>
+      <Input aria-label="Nom de l'application" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" />
       <div className="flex flex-wrap items-center gap-2">
         <Input type="file" accept=".ipa" className="max-w-xs" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         <Button disabled={!file || busy} onClick={publish}><Upload /> {busy ? "Importation..." : "Publier l'IPA signé"}</Button>
       </div>
+      </>}
     </li>
   );
 }

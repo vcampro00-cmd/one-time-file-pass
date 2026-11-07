@@ -37,6 +37,7 @@ function DevicePage() {
 
   if (d === undefined) return <Loader2 className="mx-auto animate-spin" />;
   if (!d) return <p className="text-center text-destructive">Lien invalide.</p>;
+  if (d.cancelled) return <p role="alert" className="text-center text-destructive">Installation annulée. Contactez VCAMPRO INSTALLER.</p>;
 
   const manifest = `${window.location.origin}/api/public/udid/manifest?t=${token}`;
   return (

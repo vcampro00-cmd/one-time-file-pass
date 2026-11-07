@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, KeyRound, LogOut, Trash2, Upload } from "lucide-react";
+import { Copy, KeyRound, LogOut, Settings2, Smartphone, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,7 @@ function Painel() {
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [latest, setLatest] = useState<{ code: string; expiresAt: string } | null>(null);
+  const [view, setView] = useState<"devices" | "codes" | "settings">("devices");
   const now = useNow();
 
   const files = useQuery({
@@ -76,8 +77,9 @@ function Painel() {
     if (!list?.length) return;
     setUploading(true);
     const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { setUploading(false); toast.error("Veuillez vous reconnecter"); return; }
     for (const file of Array.from(list)) {
-      const path = `${u.user!.id}/${crypto.randomUUID()}-${file.name}`;
+      const path = `${u.user.id}/${crypto.randomUUID()}-${file.name}`;
       const { error } = await supabase.storage.from("files").upload(path, file);
       if (error) {
         toast.error(`Échec de l’import de ${file.name}`);
@@ -129,15 +131,25 @@ function Painel() {
       <header className="cyber-header flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <BrandLogo className="h-14 w-24 shrink-0 sm:h-16 sm:w-28" />
-          <span className="font-mono text-xs font-bold break-words">TABLEAU DE BORD</span>
+          <span className="hidden font-mono text-xs font-bold sm:block">TABLEAU DE BORD</span>
         </div>
         <Button variant="ghost" size="sm" onClick={signOut}>
           <LogOut /> Déconnexion
         </Button>
       </header>
 
-      <div className="mx-auto grid max-w-5xl gap-8 px-4 pb-16 pt-10 lg:grid-cols-[1.4fr_1fr]">
-        <section className="lock-card p-4 sm:p-6">
+      <div className="mx-auto max-w-5xl px-4 pb-16">
+        <nav className="flex flex-wrap gap-2 border-b border-border py-5" aria-label="Sections du tableau de bord">
+          <Button variant={view === "devices" ? "brand" : "ghost"} aria-pressed={view === "devices"} onClick={() => setView("devices")}><Smartphone /> Appareils</Button>
+          <Button variant={view === "codes" ? "brand" : "ghost"} aria-pressed={view === "codes"} onClick={() => setView("codes")}><KeyRound /> Générateur de codes</Button>
+          <Button variant={view === "settings" ? "brand" : "ghost"} aria-pressed={view === "settings"} onClick={() => setView("settings")}><Settings2 /> Affichage client</Button>
+        </nav>
+        {view === "devices" && <DevicesPanel />}
+        {view === "settings" && <CustomerStepsPanel />}
+        <div hidden={view !== "codes"}>
+        <h1 className="py-6 text-2xl font-bold">Générateur de codes</h1>
+      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+        <section className="py-2">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-bold">Fichiers</h2>
             <input ref={inputRef} type="file" multiple hidden onChange={(e) => upload(e.target.files)} />
@@ -161,7 +173,7 @@ function Painel() {
         </section>
 
         <section className="space-y-6">
-          <div className="lock-card p-4 sm:p-6">
+          <div className="border-b border-border py-2 pb-6">
             <h2 className="mb-1 text-xl font-bold">Générer un code</h2>
             <p className="mb-4 text-sm text-muted-foreground">
               {selected.size} fichier(s) sélectionné(s). Usage unique, valable 20 minutes.
@@ -198,7 +210,7 @@ function Painel() {
             )}
           </div>
 
-          <div className="lock-card p-4 sm:p-6">
+          <div className="py-2">
             <h2 className="mb-3 text-lg font-bold">Codes récents</h2>
             <ul className="space-y-2 text-sm">
               {codes.data?.map((c) => {
@@ -218,7 +230,8 @@ function Painel() {
           </div>
         </section>
       </div>
-      <div className="px-4"><CustomerStepsPanel /><DevicesPanel /></div>
+        </div>
+      </div>
     </main>
   );
 }
