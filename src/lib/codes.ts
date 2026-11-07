@@ -66,3 +66,15 @@ export function codeStatus(
 export function canRevealCode(c: { expires_at: string; used_at: string | null }, now = new Date()): boolean {
   return codeStatus(c, now) === "ativa";
 }
+
+// A bought code waits this long for its first entry on the site; the 20 minutes start only then.
+export const UNUSED_CODE_DAYS = 30;
+
+export function unusedExpiresAtFrom(now: Date): Date {
+  return new Date(now.getTime() + UNUSED_CODE_DAYS * 86_400_000);
+}
+
+// First entry on the site: the 20-minute window starts now.
+export function firstUseExpiry(firstUse: Date): Date {
+  return expiresAtFrom(firstUse);
+}

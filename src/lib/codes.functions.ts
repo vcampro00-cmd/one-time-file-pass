@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   CODE_LENGTH,
   expiresAtFrom,
+  firstUseExpiry,
   generateCode,
   hashCode,
   isMasterCode,
@@ -93,8 +94,23 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error("Erreur lors de la vérification du code");
     if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null, expiresAt: null };
-    if (!claimed.used_at)
-      await supabaseAdmin.from("access_codes").update({ used_at: nowIso }).eq("id", claimed.id).is("used_at", null);
+    let expiresAt = claimed.expires_at as string;
+    if (!claimed.used_at) {
+      // First entry: the 20-minute window starts now.
+      const exp = firstUseExpiry(new Date(nowIso)).toISOString();
+      const { data: upd } = await supabaseAdmin
+        .from("access_codes")
+        .update({ used_at: nowIso, expires_at: exp })
+        .eq("id", claimed.id)
+        .is("used_at", null)
+        .select("expires_at")
+        .maybeSingle();
+      if (upd) expiresAt = upd.expires_at;
+      else {
+        const { data: again } = await supabaseAdmin.from("access_codes").select("expires_at").eq("id", claimed.id).single();
+        if (again) expiresAt = again.expires_at;
+      }
+    }
 
     const { data: links } = await supabaseAdmin
       .from("access_code_files")
@@ -106,5 +122,5 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       const f = l.files as unknown as StoredFile | null;
       if (f) rows.push(f);
     }
-    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), expiresAt: claimed.expires_at as string | null };
+    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), expiresAt: expiresAt as string | null };
   });

@@ -72,7 +72,7 @@ export function RecoverCode() {
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Votre code</p>
           <p className="font-mono text-3xl tracking-[0.2em] text-accent">{formatCode(code)}</p>
           <p className="text-sm text-muted-foreground">
-            Temps restant : <span className="font-mono">{time}</span>
+            {left > 20 * 60 ? "Les 20 minutes commencent à la saisie du code." : <>Temps restant : <span className="font-mono">{time}</span></>}
           </p>
           <Button type="button" variant="outline" size="sm" className="w-full" onClick={copy}>
             {copied ? <Check /> : null}
