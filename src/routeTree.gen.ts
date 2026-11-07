@@ -23,6 +23,7 @@ import { Route as AchatRetourRouteImport } from './routes/achat.retour'
 import { Route as AppareilTokenRouteImport } from './routes/appareil.$token'
 import { Route as GarantieTokenRouteImport } from './routes/garantie.$token'
 import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
+import { Route as RevendeurKeyRouteImport } from './routes/revendeur.$key'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
 import { Route as ApiPublicLicensesVerifyRouteImport } from './routes/api/public/licenses/verify'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -100,6 +101,11 @@ const LicencesRetourRoute = LicencesRetourRouteImport.update({
   path: '/licences/retour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RevendeurKeyRoute = RevendeurKeyRouteImport.update({
+  id: '/revendeur/$key',
+  path: '/revendeur/$key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDnsProfileRoute = ApiPublicDnsProfileRouteImport.update({
   id: '/api/public/dns-profile',
   path: '/api/public/dns-profile',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
+  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
+  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences_/retour': typeof LicencesRetourRoute
+  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences/retour'
+    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences/retour'
+    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences_/retour'
+    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   AchatRetourRoute: typeof AchatRetourRoute
   GarantieTokenRoute: typeof GarantieTokenRoute
   LicencesRetourRoute: typeof LicencesRetourRoute
+  RevendeurKeyRoute: typeof RevendeurKeyRoute
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
   ApiPublicLicensesVerifyRoute: typeof ApiPublicLicensesVerifyRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LicencesRetourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/revendeur/$key': {
+      id: '/revendeur/$key'
+      path: '/revendeur/$key'
+      fullPath: '/revendeur/$key'
+      preLoaderRoute: typeof RevendeurKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/dns-profile': {
       id: '/api/public/dns-profile'
       path: '/api/public/dns-profile'
@@ -466,6 +486,7 @@ const rootRouteChildren: RootRouteChildren = {
   AchatRetourRoute: AchatRetourRoute,
   GarantieTokenRoute: GarantieTokenRoute,
   LicencesRetourRoute: LicencesRetourRoute,
+  RevendeurKeyRoute: RevendeurKeyRoute,
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
   ApiPublicLicensesVerifyRoute: ApiPublicLicensesVerifyRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
