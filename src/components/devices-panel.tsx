@@ -30,8 +30,8 @@ export function DevicesPanel() {
           <Copy /> Copier le lien « Certifier l'appareil »
         </Button>
         <Button size="sm" variant="outline" asChild>
-          <a href="https://maplesign.ca" target="_blank" rel="noreferrer">
-            <ExternalLink /> Ouvrir MapleSign
+          <a href="https://kravasign.com" target="_blank" rel="noreferrer">
+            <ExternalLink /> Ouvrir Kravasign
           </a>
         </Button>
       </div>
