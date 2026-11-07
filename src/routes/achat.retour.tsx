@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Check, Copy, Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { claimPurchasedCode } from "@/lib/payments.functions";
@@ -32,7 +32,17 @@ function Retour() {
   const { session_id } = Route.useSearch();
   const claim = useServerFn(claimPurchasedCode);
   const [res, setRes] = useState<{ code: string; expiresAt: string } | { error: string } | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const [copied, setCopied] = useState(false);
+
+  async function copy(code: string) {
+    try {
+      await navigator.clipboard.writeText(formatCode(code));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard refused: the code is on screen anyway */
+    }
+  }
 
   useEffect(() => {
     if (!session_id) return setRes({ error: "Aucun achat trouvé." });
@@ -40,15 +50,7 @@ function Retour() {
     claim({ data: { sessionId: session_id, environment: getStripeEnvironment() } })
       .then(setRes)
       .catch(() => setRes({ error: "Impossible de récupérer votre code." }));
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
   }, [session_id]);
-
-  let left = "";
-  if (res && "code" in res) {
-    const s = Math.max(0, Math.floor((new Date(res.expiresAt).getTime() - now) / 1000));
-    left = s > 0 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` : "expiré";
-  }
 
   return (
     <main className="grid-paper flex min-h-screen flex-col items-center justify-center gap-6 px-4">
@@ -60,8 +62,12 @@ function Retour() {
           <>
             <h1 className="text-2xl font-bold">Merci ! Voici votre code</h1>
             <p className="font-mono text-4xl tracking-[0.2em] text-accent">{formatCode(res.code)}</p>
+            <Button type="button" variant="outline" className="w-full" onClick={() => copy(res.code)}>
+              {copied ? <Check /> : <Copy />}
+              {copied ? "Copié !" : "Copier le code"}
+            </Button>
             <p className="text-sm text-muted-foreground">
-              À usage unique. Temps restant : <span className="font-mono">{left}</span>
+              Les 20 minutes commencent seulement quand vous saisissez le code sur le site.
             </p>
             <Button asChild className="w-full">
               <Link to="/">Utiliser le code maintenant</Link>
