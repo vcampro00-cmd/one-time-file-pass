@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { readIpaInfo } from "@/lib/ipa-info";
 
 type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; ready_at: string | null; app_name: string | null; created_at: string };
 
@@ -45,14 +46,20 @@ export function DevicesPanel() {
 
 function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
   const [file, setFile] = useState<File | null>(null);
-  const [name, setName] = useState(d.app_name ?? "VCAMPRO — Dopamine");
-  const [bundle, setBundle] = useState("com.opa334.Dopamine");
-  const [version, setVersion] = useState("1.0");
+  const [name, setName] = useState(d.app_name ?? "VCAMPRO");
   const [busy, setBusy] = useState(false);
 
   async function publish() {
     if (!file) return;
     setBusy(true);
+    let bundle: string, version: string;
+    try {
+      ({ bundleId: bundle, version } = await readIpaInfo(file));
+    } catch {
+      toast.error("Fichier IPA illisible");
+      setBusy(false);
+      return;
+    }
     const { data: u } = await supabase.auth.getUser();
     const path = `${u.user!.id}/devices/${d.id}/${crypto.randomUUID()}.ipa`;
     const { error } = await supabase.storage.from("files").upload(path, file, { contentType: "application/octet-stream" });
@@ -81,11 +88,7 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
         <span className="break-all font-mono text-sm">{d.udid}</span>
         <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(d.udid); toast.success("UDID copié"); }}><Copy /> Copier</Button>
       </div>
-      <div className="grid gap-2 sm:grid-cols-3">
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" />
-        <Input value={bundle} onChange={(e) => setBundle(e.target.value)} placeholder="Bundle ID" />
-        <Input value={version} onChange={(e) => setVersion(e.target.value)} placeholder="Version" />
-      </div>
+      <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" />
       <div className="flex flex-wrap items-center gap-2">
         <Input type="file" accept=".ipa" className="max-w-xs" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         <Button disabled={!file || busy} onClick={publish}><Upload /> {busy ? "Importation..." : "Publier l'IPA signé"}</Button>
