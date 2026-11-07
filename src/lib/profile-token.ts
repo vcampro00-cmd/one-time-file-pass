@@ -35,3 +35,27 @@ export async function verifyProfileToken(secret: string, token: string, now = Da
 export function profileUrl(token: string) {
   return `/api/public/dns-profile?t=${encodeURIComponent(token)}`;
 }
+
+// Signed token for the certification profile, carrying the reseller flag.
+// Format: "<expiresAtMs>.<0|1>.<hex hmac-sha256>".
+export async function signCertifyToken(secret: string, reseller: boolean, now = Date.now()): Promise<string> {
+  const exp = now + PROFILE_TOKEN_TTL_MS;
+  const r = reseller ? "1" : "0";
+  return `${exp}.${r}.${await hmac(secret, `certify:${exp}:${r}`)}`;
+}
+
+export async function verifyCertifyToken(secret: string, token: string, now = Date.now()): Promise<{ reseller: boolean } | null> {
+  const [expStr, r, sig, extra] = String(token ?? "").split(".");
+  if (!expStr || !sig || extra !== undefined || !/^\d{1,15}$/.test(expStr) || (r !== "0" && r !== "1")) return null;
+  const exp = Number(expStr);
+  if (exp <= now) return null;
+  const expected = await hmac(secret, `certify:${exp}:${r}`);
+  if (expected.length !== sig.length) return null;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ sig.charCodeAt(i);
+  return diff === 0 ? { reseller: r === "1" } : null;
+}
+
+export function certifyUrl(token: string) {
+  return `/api/public/udid/profile?ct=${encodeURIComponent(token)}`;
+}

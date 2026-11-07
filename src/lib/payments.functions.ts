@@ -49,22 +49,35 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
     if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new Error("Session invalide");
     return { sessionId, environment: checkEnv(d.environment) };
   })
-  .handler(async ({ data }): Promise<{ code: string; expiresAt: string } | { error: string }> => {
+  .handler(async ({ data }): Promise<{ code: string; expiresAt: string; reseller: boolean } | { error: string }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: existing } = await supabaseAdmin
       .from("code_purchases")
-      .select("code, expires_at")
+      .select("code, expires_at, reseller")
       .eq("session_id", data.sessionId)
       .maybeSingle();
-    if (existing) return { code: existing.code, expiresAt: existing.expires_at };
+    if (existing) return { code: existing.code, expiresAt: existing.expires_at, reseller: existing.reseller };
 
+    const stripe = createStripeClient(data.environment);
     let session: Stripe.Checkout.Session;
     try {
-      session = await createStripeClient(data.environment).checkout.sessions.retrieve(data.sessionId);
+      session = await stripe.checkout.sessions.retrieve(data.sessionId);
     } catch (e) {
       return { error: getStripeErrorMessage(e) };
     }
     if (session.payment_status === "unpaid") return { error: "Paiement non confirmé." };
+
+    // Reseller purchase: the session was paid with the reseller price.
+    let reseller = false;
+    try {
+      const items = await stripe.checkout.sessions.listLineItems(data.sessionId, { limit: 5 });
+      reseller = items.data.some((i) => {
+        const p = i.price;
+        return p?.lookup_key === RESELLER_PRICE_ID;
+      });
+    } catch {
+      reseller = false;
+    }
 
     const { data: files } = await supabaseAdmin.from("files").select("id, owner_id");
     if (!files || files.length === 0) return { error: "Aucun fichier disponible pour le moment." };
@@ -73,7 +86,7 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
     const expiresAt = unusedExpiresAtFrom(new Date()).toISOString();
     const { data: row, error } = await supabaseAdmin
       .from("access_codes")
-      .insert({ owner_id: files[0]!.owner_id, code_hash: await hashCode(code), expires_at: expiresAt })
+      .insert({ owner_id: files[0]!.owner_id, code_hash: await hashCode(code), expires_at: expiresAt, reseller })
       .select("id")
       .single();
     if (error) return { error: "Erreur lors de la création du code." };
@@ -84,18 +97,19 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
       code,
       code_id: row.id,
       expires_at: expiresAt,
+      reseller,
     });
     if (pe) {
       // Another request created it first: discard ours, return theirs.
       await supabaseAdmin.from("access_codes").delete().eq("id", row.id);
       const { data: again } = await supabaseAdmin
-        .from("code_purchases").select("code, expires_at").eq("session_id", data.sessionId).single();
-      return again ? { code: again.code, expiresAt: again.expires_at } : { error: "Erreur." };
+        .from("code_purchases").select("code, expires_at, reseller").eq("session_id", data.sessionId).single();
+      return again ? { code: again.code, expiresAt: again.expires_at, reseller: again.reseller } : { error: "Erreur." };
     }
     await supabaseAdmin
       .from("access_code_files")
       .insert(files.map((f) => ({ code_id: row.id, file_id: f.id })));
-    return { code, expiresAt };
+    return { code, expiresAt, reseller };
   });
 
 // Public: shows a purchased code again, only while it can still be redeemed.
