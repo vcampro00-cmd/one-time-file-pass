@@ -4,6 +4,7 @@ import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib
 import { canRevealCode, generateCode, hashCode, unusedExpiresAtFrom } from "./codes";
 
 export const CODE_PRICE_ID = "access_code_10min_eur";
+export const RESELLER_PRICE_ID = "access_code_reseller_eur";
 
 function checkEnv(env: unknown): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Environnement invalide");
@@ -12,14 +13,15 @@ function checkEnv(env: unknown): StripeEnv {
 
 // Public: anyone can start buying a 10-minute code.
 export const createCodeCheckout = createServerFn({ method: "POST" })
-  .validator((d: { returnUrl: string; environment: StripeEnv }) => ({
+  .validator((d: { returnUrl: string; environment: StripeEnv; reseller?: boolean }) => ({
     returnUrl: String(d.returnUrl),
     environment: checkEnv(d.environment),
+    reseller: d.reseller === true,
   }))
   .handler(async ({ data }): Promise<{ clientSecret: string } | { error: string }> => {
     try {
       const stripe = createStripeClient(data.environment);
-      const prices = await stripe.prices.list({ lookup_keys: [CODE_PRICE_ID] });
+      const prices = await stripe.prices.list({ lookup_keys: [data.reseller ? RESELLER_PRICE_ID : CODE_PRICE_ID] });
       const price = prices.data[0];
       if (!price) throw new Error("Prix introuvable");
       const productId = typeof price.product === "string" ? price.product : price.product.id;
