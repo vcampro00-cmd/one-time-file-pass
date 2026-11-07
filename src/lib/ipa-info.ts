@@ -1,6 +1,6 @@
 import { unzip } from "fflate";
 
-export type IpaInfo = { bundleId: string; version: string; name?: string };
+export type IpaInfo = { bundleId: string; version: string; name?: string | undefined };
 
 const INFO_RE = /^Payload\/[^/]+\.app\/Info\.plist$/;
 
@@ -36,7 +36,6 @@ function parseXml(xml: string): Record<string, string> {
 }
 
 function parseBinary(raw: Uint8Array): Record<string, string> {
-  const b = Array.from(raw) as number[] & { [i: number]: number };
   const dv = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
   const t = b.length - 32;
   const offSize = raw[t + 6]!, refSize = raw[t + 7]!;
