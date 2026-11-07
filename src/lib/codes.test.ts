@@ -12,9 +12,9 @@ import {
 } from "./codes";
 
 describe("one-time passwords", () => {
-  it("expire 10 minutes after creation", () => {
+  it("expire 20 minutes after creation", () => {
     const now = new Date("2026-01-01T12:00:00Z");
-    expect(expiresAtFrom(now).toISOString()).toBe("2026-01-01T12:10:00.000Z");
+    expect(expiresAtFrom(now).toISOString()).toBe("2026-01-01T12:20:00.000Z");
   });
 
   it("cannot be reused once used, even before expiry", () => {
