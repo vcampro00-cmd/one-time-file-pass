@@ -143,7 +143,7 @@ export function WarrantyForm() {
   const input = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent";
   return (
     <form onSubmit={submit} className="access-step space-y-3 py-6">
-      <h2 className="text-lg font-bold">4. Remplir la garantie</h2>
+      <h2 className="text-lg font-bold">5. Remplir la garantie</h2>
       <p className="text-sm text-muted-foreground">Garantie de {WARRANTY_MONTHS} mois à partir d’aujourd’hui. Conservez le PDF.</p>
       <input className={input} placeholder="Nom complet" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="Nom complet" />
       <input className={`${input} font-mono`} placeholder="IMEI (composez *#06#)" inputMode="numeric" value={imei} maxLength={17} onChange={(e) => setImei(e.target.value.replace(/[^\d ]/g, ""))} aria-label="Numéro IMEI" />
