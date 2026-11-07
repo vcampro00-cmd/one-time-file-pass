@@ -74,3 +74,12 @@ describe("typing the code", () => {
     expect(isCodeComplete("ABC-12")).toBe(false);
   });
 });
+
+describe("bought codes", () => {
+  it("start their 20 minutes only when first entered on the site", async () => {
+    const { firstUseExpiry, unusedExpiresAtFrom } = await import("./codes");
+    const bought = new Date("2026-01-01T12:00:00Z");
+    expect(unusedExpiresAtFrom(bought).toISOString()).toBe("2026-01-31T12:00:00.000Z");
+    expect(firstUseExpiry(new Date("2026-01-02T09:00:00Z")).toISOString()).toBe("2026-01-02T09:20:00.000Z");
+  });
+});

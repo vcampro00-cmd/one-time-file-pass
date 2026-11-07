@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { canRevealCode, expiresAtFrom, generateCode, hashCode } from "./codes";
+import { canRevealCode, generateCode, hashCode, unusedExpiresAtFrom } from "./codes";
 
 export const CODE_PRICE_ID = "access_code_10min_eur";
 
@@ -68,7 +68,7 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
     if (!files || files.length === 0) return { error: "Aucun fichier disponible pour le moment." };
 
     const code = generateCode();
-    const expiresAt = expiresAtFrom(new Date()).toISOString();
+    const expiresAt = unusedExpiresAtFrom(new Date()).toISOString();
     const { data: row, error } = await supabaseAdmin
       .from("access_codes")
       .insert({ owner_id: files[0]!.owner_id, code_hash: await hashCode(code), expires_at: expiresAt })
