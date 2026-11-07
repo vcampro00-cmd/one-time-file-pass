@@ -9,7 +9,7 @@ import {
   isMasterCode,
   normalizeCode,
 } from "./codes";
-import { profileUrl, signProfileToken } from "./profile-token";
+import { certifyUrl, profileUrl, signCertifyToken, signProfileToken } from "./profile-token";
 
 type StoredFile = { id: string; name: string; size: number; storage_path: string };
 type FileLink = { id: string; name: string; size: number; url: string };
@@ -73,13 +73,19 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       return secret ? profileUrl(await signProfileToken(secret)) : null;
     }
 
+    // Certification link signed with the reseller flag, so the device inherits the warranty length.
+    async function certifyLink(reseller: boolean): Promise<string | null> {
+      const secret = process.env["DNS_PROFILE_SIGNING_SECRET"];
+      return secret ? certifyUrl(await signCertifyToken(secret, reseller)) : null;
+    }
+
     // Owner's permanent test code: unlocks every file, is never consumed.
     if (isMasterCode(data.code)) {
       const { data: rows } = await supabaseAdmin
         .from("files")
         .select("id, name, size, storage_path")
         .order("created_at", { ascending: false });
-      return { ok: true as const, files: await sign(rows ?? []), profileUrl: await profileLink(), expiresAt: null as string | null };
+      return { ok: true as const, files: await sign(rows ?? []), profileUrl: await profileLink(), certifyUrl: await certifyLink(false), reseller: false, expiresAt: null as string | null };
     }
 
     const hash = await hashCode(data.code);
@@ -88,12 +94,12 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
     // Valid for its whole 10-minute window: reusable until expires_at, first use is recorded.
     const { data: claimed, error } = await supabaseAdmin
       .from("access_codes")
-      .select("id, used_at, expires_at")
+      .select("id, used_at, expires_at, reseller")
       .eq("code_hash", hash)
       .gt("expires_at", nowIso)
       .maybeSingle();
     if (error) throw new Error("Erreur lors de la vérification du code");
-    if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null, expiresAt: null };
+    if (!claimed) return { ok: false as const, files: [] as FileLink[], profileUrl: null, certifyUrl: null, reseller: false, expiresAt: null };
     let expiresAt = claimed.expires_at as string;
     if (!claimed.used_at) {
       // First entry: the 20-minute window starts now.
@@ -122,5 +128,5 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       const f = l.files as unknown as StoredFile | null;
       if (f) rows.push(f);
     }
-    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), expiresAt: expiresAt as string | null };
+    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), certifyUrl: await certifyLink(claimed.reseller), reseller: claimed.reseller, expiresAt: expiresAt as string | null };
   });
