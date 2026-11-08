@@ -95,7 +95,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
 
   if (panel.isLoading) return <main className="p-10 text-center text-muted-foreground">Chargement…</main>;
   const p = panel.data;
-  if (!p) { onLogout(); return null; }
+  if (!p) return <main className="space-y-4 p-10 text-center"><p>Session expirée ou compte désactivé.</p><Button variant="brand" onClick={onLogout}><LogIn /> Se reconnecter</Button></main>;
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
