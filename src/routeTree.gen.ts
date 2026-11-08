@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LicencesRouteImport } from './routes/licences'
 import { Route as LicencesConnexionRouteImport } from './routes/licences-connexion'
 import { Route as RevendaRouteImport } from './routes/revenda'
+import { Route as RevendeurRouteImport } from './routes/revendeur'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_authenticated/gestion-licences'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
@@ -23,7 +24,6 @@ import { Route as AchatRetourRouteImport } from './routes/achat.retour'
 import { Route as AppareilTokenRouteImport } from './routes/appareil.$token'
 import { Route as GarantieTokenRouteImport } from './routes/garantie.$token'
 import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
-import { Route as RevendeurKeyRouteImport } from './routes/revendeur.$key'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
 import { Route as ApiPublicLicensesVerifyRouteImport } from './routes/api/public/licenses/verify'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -65,6 +65,11 @@ const RevendaRoute = RevendaRouteImport.update({
   path: '/revenda',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RevendeurRoute = RevendeurRouteImport.update({
+  id: '/revendeur',
+  path: '/revendeur',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -99,11 +104,6 @@ const GarantieTokenRoute = GarantieTokenRouteImport.update({
 const LicencesRetourRoute = LicencesRetourRouteImport.update({
   id: '/licences_/retour',
   path: '/licences/retour',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RevendeurKeyRoute = RevendeurKeyRouteImport.update({
-  id: '/revendeur/$key',
-  path: '/revendeur/$key',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicDnsProfileRoute = ApiPublicDnsProfileRouteImport.update({
@@ -145,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
   '/revenda': typeof RevendaRoute
+  '/revendeur': typeof RevendeurRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -152,7 +153,6 @@ export interface FileRoutesByFullPath {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
-  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -167,6 +167,7 @@ export interface FileRoutesByTo {
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
   '/revenda': typeof RevendaRoute
+  '/revendeur': typeof RevendeurRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -174,7 +175,6 @@ export interface FileRoutesByTo {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
-  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -191,6 +191,7 @@ export interface FileRoutesById {
   '/licences': typeof LicencesRoute
   '/licences-connexion': typeof LicencesConnexionRoute
   '/revenda': typeof RevendaRoute
+  '/revendeur': typeof RevendeurRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/gestion-licences': typeof AuthenticatedGestionLicencesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
@@ -198,7 +199,6 @@ export interface FileRoutesById {
   '/appareil/$token': typeof AppareilTokenRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences_/retour': typeof LicencesRetourRoute
-  '/revendeur/$key': typeof RevendeurKeyRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
   '/api/public/licenses/verify': typeof ApiPublicLicensesVerifyRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -215,6 +215,7 @@ export interface FileRouteTypes {
     | '/licences'
     | '/licences-connexion'
     | '/revenda'
+    | '/revendeur'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -222,7 +223,6 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences/retour'
-    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -237,6 +237,7 @@ export interface FileRouteTypes {
     | '/licences'
     | '/licences-connexion'
     | '/revenda'
+    | '/revendeur'
     | '/sitemap.xml'
     | '/gestion-licences'
     | '/painel'
@@ -244,7 +245,6 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences/retour'
-    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -260,6 +260,7 @@ export interface FileRouteTypes {
     | '/licences'
     | '/licences-connexion'
     | '/revenda'
+    | '/revendeur'
     | '/sitemap.xml'
     | '/_authenticated/gestion-licences'
     | '/_authenticated/painel'
@@ -267,7 +268,6 @@ export interface FileRouteTypes {
     | '/appareil/$token'
     | '/garantie/$token'
     | '/licences_/retour'
-    | '/revendeur/$key'
     | '/api/public/dns-profile'
     | '/api/public/licenses/verify'
     | '/api/public/payments/webhook'
@@ -284,11 +284,11 @@ export interface RootRouteChildren {
   LicencesRoute: typeof LicencesRoute
   LicencesConnexionRoute: typeof LicencesConnexionRoute
   RevendaRoute: typeof RevendaRoute
+  RevendeurRoute: typeof RevendeurRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
   GarantieTokenRoute: typeof GarantieTokenRoute
   LicencesRetourRoute: typeof LicencesRetourRoute
-  RevendeurKeyRoute: typeof RevendeurKeyRoute
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
   ApiPublicLicensesVerifyRoute: typeof ApiPublicLicensesVerifyRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -348,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/revendeur': {
+      id: '/revendeur'
+      path: '/revendeur'
+      fullPath: '/revendeur'
+      preLoaderRoute: typeof RevendeurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -395,13 +402,6 @@ declare module '@tanstack/react-router' {
       path: '/licences/retour'
       fullPath: '/licences/retour'
       preLoaderRoute: typeof LicencesRetourRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/revendeur/$key': {
-      id: '/revendeur/$key'
-      path: '/revendeur/$key'
-      fullPath: '/revendeur/$key'
-      preLoaderRoute: typeof RevendeurKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/dns-profile': {
@@ -482,11 +482,11 @@ const rootRouteChildren: RootRouteChildren = {
   LicencesRoute: LicencesRoute,
   LicencesConnexionRoute: LicencesConnexionRoute,
   RevendaRoute: RevendaRoute,
+  RevendeurRoute: RevendeurRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
   GarantieTokenRoute: GarantieTokenRoute,
   LicencesRetourRoute: LicencesRetourRoute,
-  RevendeurKeyRoute: RevendeurKeyRoute,
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,
   ApiPublicLicensesVerifyRoute: ApiPublicLicensesVerifyRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
