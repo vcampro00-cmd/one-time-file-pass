@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { creditsWithBonus, isHex32, linkExpiry, normalizeUsername, randomHex, sessionExpiry, sha256Hex, verifyPassword } from "@/lib/resellers";
+import { creditsWithBonus, isHex32, linkExpiry, normalizeUsername, randomHex, sessionExpiry, sha256Hex, shortCode, verifyPassword } from "@/lib/resellers";
 
 async function admin() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
@@ -50,7 +50,7 @@ export const getResellerPanel = createServerFn({ method: "POST" })
     if (!r) return null;
     const { data: links } = await (await admin())
       .from("reseller_links")
-      .select("token, label, expires_at, used_at, created_at")
+      .select("token, short_code, label, expires_at, used_at, created_at")
       .eq("reseller_id", r.id)
       .order("created_at", { ascending: false })
       .limit(30);
@@ -67,15 +67,17 @@ export const createResellerLink = createServerFn({ method: "POST" })
     const r = await resellerFromSession(data.session);
     if (!r) return { ok: false as const, error: "Session expirée, reconnectez-vous" };
     const token = randomHex();
+    const code = shortCode();
     const { data: left, error } = await (await admin()).rpc("consume_reseller_credit_for", {
       _reseller: r.id,
       _token: token,
       _label: data.label,
       _expires: linkExpiry().toISOString(),
+      _short_code: code,
     });
     if (error) return { ok: false as const, error: "Erreur, réessayez" };
     if (left === -1) return { ok: false as const, error: "Crédits insuffisants" };
-    return { ok: true as const, token, credits: left as number };
+    return { ok: true as const, token, short_code: code, credits: left as number };
   });
 
 export const MAX_CREDITS_PER_PURCHASE = 50;

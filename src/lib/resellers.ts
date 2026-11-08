@@ -43,6 +43,15 @@ export const MIN_PASSWORD_LENGTH = 6;
 
 export const isHex32 = (s: unknown): s is string => typeof s === "string" && /^[0-9a-f]{32}$/.test(s);
 
+// Short public code for certification links (easy to type by hand). No 0/O/1/I/L to avoid confusion.
+const SHORT_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+export function shortCode(length = 6): string {
+  const a = new Uint8Array(length);
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => SHORT_CODE_ALPHABET[b % SHORT_CODE_ALPHABET.length]).join("");
+}
+export const isShortCode = (s: unknown): s is string => typeof s === "string" && /^[A-HJ-NP-Z2-9]{6}$/.test(s);
+
 export function linkExpiry(now = Date.now()): Date {
   return new Date(now + RESELLER_LINK_TTL_HOURS * 3600_000);
 }
