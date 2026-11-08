@@ -1,11 +1,13 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronDown, ChevronUp, KeyRound, Minus, Plus, Trash2, UserPlus } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, KeyRound, Minus, Plus, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { openResellerPanelAsOwner } from "@/lib/resellers.functions";
 import { hashPassword, isValidUsername, MIN_PASSWORD_LENGTH, normalizeUsername, randomHex, sha256Hex } from "@/lib/resellers";
 import { deviceStatus } from "@/lib/device-status";
 import { RESELLER_WARRANTY_MONTHS, warrantyEnd } from "@/lib/warranty";
@@ -73,7 +75,7 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
     queryKey: ["reseller-devices", r.id],
     enabled: open,
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, product, serial, ready_at, cancelled_at, ipa_path, created_at").eq("reseller_id", r.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, product, serial, ready_at, cancelled_at, ipa_path, created_at").eq("reseller.id", r.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -90,6 +92,14 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
     if (p.length < MIN_PASSWORD_LENGTH) { toast.error(`${MIN_PASSWORD_LENGTH} caractères minimum`); return; }
     await update({ password_hash: await hashPassword(p) });
     toast.success("Mot de passe modifié");
+  }
+
+  const openAs = useServerFn(openResellerPanelAsOwner);
+  async function viewPanel() {
+    const w = window.open("", "_blank");
+    const res = await openAs({ data: { resellerId: r.id } });
+    if (!res.ok) { w?.close(); toast.error(res.error); return; }
+    if (w) w.location.href = `/revendeur?as=${res.session}`; else window.location.href = `/revendeur?as=${res.session}`;
   }
 
   async function remove() {
@@ -111,6 +121,7 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
         <Button size="icon" variant="outline" aria-label="Ajouter un crédit" onClick={() => update({ credits: r.credits + 1 })}><Plus /></Button>
         <Button size="sm" variant="outline" onClick={() => update({ credits: r.credits + 5 })}>+5</Button>
         <Button size="sm" variant="outline" onClick={() => update({ credits: r.credits + 10 })}>+10</Button>
+        <Button size="sm" variant="outline" onClick={viewPanel}><ExternalLink /> Voir son panneau</Button>
         <Button size="sm" variant="ghost" onClick={newPassword}><KeyRound /> Mot de passe</Button>
         <Button size="sm" variant="ghost" onClick={() => update({ active: !r.active })}>{r.active ? "Désactiver" : "Activer"}</Button>
         <Button size="sm" variant="ghost" className="text-destructive" onClick={remove}><Trash2 /> Supprimer</Button>
