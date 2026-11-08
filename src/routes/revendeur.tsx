@@ -33,6 +33,12 @@ export const Route = createFileRoute("/revendeur")({
   component: ResellerPanel,
 });
 
+// Changing text gets its own remounted span: browser auto-translation rewrites text nodes,
+// and React crashes when it later updates text it no longer owns.
+function T({ text }: { text: string }) {
+  return <span key={text}>{text}</span>;
+}
+
 const SESSION_KEY = "vcampro-reseller-session";
 
 function ResellerPanel() {
@@ -127,8 +133,8 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
         </div>
         <Button size="sm" variant="ghost" onClick={async () => { await logout({ data: { session } }).catch(() => {}); onLogout(); }}><LogOut /> Déconnexion</Button>
         <div className="rounded-md border border-primary/40 px-4 py-2 text-center">
-          <p className="font-mono text-3xl font-bold text-primary">{p.credits}</p>
-          <p className="text-xs text-muted-foreground">crédit{p.credits > 1 ? "s" : ""}</p>
+          <p className="font-mono text-3xl font-bold text-primary"><T text={String(p.credits)} /></p>
+          <p className="text-xs text-muted-foreground"><T text={p.credits > 1 ? "crédits" : "crédit"} /></p>
         </div>
       </header>
 
@@ -140,7 +146,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
         <p className="text-sm text-muted-foreground">Chaque appareil utilise 1 crédit. Le lien est valable 24 h pour un seul iPhone, garantie 5 mois.</p>
         <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Nom du client (facultatif)" maxLength={80} />
         <Button variant="brand" className="w-full" disabled={busy || p.credits < 1} onClick={newDevice}>
-          <Plus /> {p.credits < 1 ? "Crédits insuffisants" : busy ? "Création…" : "Certifier un appareil (1 crédit)"}
+          <Plus /> <T text={p.credits < 1 ? "Crédits insuffisants" : busy ? "Création…" : "Certifier un appareil (1 crédit)"} />
         </Button>
         {current && (
           <div className="space-y-3 pt-2 text-center">
@@ -195,7 +201,7 @@ function BuyCredits({ session }: { session: string }) {
     <section className="space-y-3 rounded-lg border border-border p-5">
       <h2 className="flex items-center gap-2 font-semibold"><ShoppingCart className="size-5" /> Acheter des crédits</h2>
       <p className="rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">PROMO : 4 crédits pour le prix de 3 !</p>
-      <p className="text-sm text-muted-foreground">{RESELLER_CREDIT_PRICE_EUR} € par crédit. Pour 3 crédits payés, 1 offert. Ajoutés dès le paiement confirmé.</p>
+      <p className="text-sm text-muted-foreground">{`${RESELLER_CREDIT_PRICE_EUR} € par crédit.`} Pour 3 crédits payés, 1 offert. Ajoutés dès le paiement confirmé.</p>
       <div className="flex gap-2">
         <Button type="button" variant="outline" aria-label="Moins" onClick={() => { const n = Math.max(1, qty - 1); setQty(n); setQtyText(String(n)); }}>−</Button>
         <Input inputMode="numeric" pattern="[0-9]*" aria-label="Nombre de crédits" className="w-16 text-center" value={qtyText}
@@ -207,11 +213,11 @@ function BuyCredits({ session }: { session: string }) {
           }}
           onBlur={() => setQtyText(String(qty))} />
         <Button type="button" variant="outline" aria-label="Plus" onClick={() => { const n = Math.min(MAX_CREDITS_PER_PURCHASE, qty + 1); setQty(n); setQtyText(String(n)); }}>+</Button>
-        <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> Payer {qty} — recevoir {creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} · {qty * RESELLER_CREDIT_PRICE_EUR} €</Button>
+        <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> <T text={`Payer ${qty} — recevoir ${creditsWithBonus(qty)} crédit${creditsWithBonus(qty) > 1 ? "s" : ""} · ${qty * RESELLER_CREDIT_PRICE_EUR} €`} /></Button>
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] w-[calc(100vw-1rem)] max-w-lg overflow-x-hidden overflow-y-auto p-3 sm:p-6">
-          <DialogHeader><DialogTitle>{creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} — {qty * RESELLER_CREDIT_PRICE_EUR} €</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle><T text={`${creditsWithBonus(qty)} crédit${creditsWithBonus(qty) > 1 ? "s" : ""} — ${qty * RESELLER_CREDIT_PRICE_EUR} €`} /></DialogTitle></DialogHeader>
           {open && (
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
               <EmbeddedCheckout />
