@@ -4,15 +4,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { Copy, Plus, Smartphone } from "lucide-react";
+import { Copy, LogIn, LogOut, Plus, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/brand-logo";
-import { createResellerLink, getResellerPanel } from "@/lib/resellers.functions";
+import { createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
 import { isLinkUsable } from "@/lib/resellers";
 
-export const Route = createFileRoute("/revendeur/$key")({
+export const Route = createFileRoute("/revendeur")({
   staticData: { sitemap: false },
   ssr: false,
   head: () => ({
@@ -29,12 +29,49 @@ export const Route = createFileRoute("/revendeur/$key")({
   component: ResellerPanel,
 });
 
+const SESSION_KEY = "vcampro-reseller-session";
+
 function ResellerPanel() {
-  const { key } = Route.useParams();
+  const [session, setSession] = useState<string | null | undefined>(undefined);
+  useEffect(() => { setSession(localStorage.getItem(SESSION_KEY)); }, []);
+  if (session === undefined) return <main className="p-10 text-center text-muted-foreground">Chargement…</main>;
+  if (!session) return <Login onLogin={(s) => { localStorage.setItem(SESSION_KEY, s); setSession(s); }} />;
+  return <Panel session={session} onLogout={() => { localStorage.removeItem(SESSION_KEY); setSession(null); }} />;
+}
+
+function Login({ onLogin }: { onLogin: (s: string) => void }) {
+  const login = useServerFn(resellerLogin);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const res = await login({ data: { username, password } });
+    setBusy(false);
+    if (!res.ok) { toast.error(res.error); return; }
+    onLogin(res.session);
+  }
+  return (
+    <main className="mx-auto max-w-sm space-y-6 px-4 py-10">
+      <BrandLogo />
+      <form onSubmit={submit} className="space-y-3 rounded-lg border border-border p-5">
+        <h1 className="text-xl font-bold">Espace revendeur</h1>
+        <Input autoComplete="username" autoCapitalize="none" placeholder="Identifiant" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <Input type="password" autoComplete="current-password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Button type="submit" variant="brand" className="w-full" disabled={busy || !username || !password}><LogIn /> {busy ? "Connexion…" : "Se connecter"}</Button>
+      </form>
+    </main>
+  );
+}
+
+function Panel({ session, onLogout }: { session: string; onLogout: () => void }) {
+  const key = session;
+  const logout = useServerFn(resellerLogout);
   const qc = useQueryClient();
   const load = useServerFn(getResellerPanel);
   const create = useServerFn(createResellerLink);
-  const panel = useQuery({ queryKey: ["reseller", key], queryFn: () => load({ data: { key } }), refetchInterval: 15000 });
+  const panel = useQuery({ queryKey: ["reseller", key], queryFn: () => load({ data: { session: key } }), refetchInterval: 15000 });
   const [label, setLabel] = useState("");
   const [busy, setBusy] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
@@ -48,7 +85,7 @@ function ResellerPanel() {
 
   async function newDevice() {
     setBusy(true);
-    const res = await create({ data: { key, label } });
+    const res = await create({ data: { session: key, label } });
     setBusy(false);
     if (!res.ok) { toast.error(res.error); return; }
     setCurrent(res.token);
@@ -58,7 +95,7 @@ function ResellerPanel() {
 
   if (panel.isLoading) return <main className="p-10 text-center text-muted-foreground">Chargement…</main>;
   const p = panel.data;
-  if (!p) return <main className="p-10 text-center">Lien revendeur invalide ou désactivé.</main>;
+  if (!p) { onLogout(); return null; }
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
@@ -68,6 +105,7 @@ function ResellerPanel() {
           <p className="text-sm text-muted-foreground">Espace revendeur</p>
           <h1 className="text-2xl font-bold">{p.name}</h1>
         </div>
+        <Button size="sm" variant="ghost" onClick={async () => { await logout({ data: { session } }).catch(() => {}); onLogout(); }}><LogOut /> Déconnexion</Button>
         <div className="rounded-md border border-primary/40 px-4 py-2 text-center">
           <p className="font-mono text-3xl font-bold text-primary">{p.credits}</p>
           <p className="text-xs text-muted-foreground">crédit{p.credits > 1 ? "s" : ""}</p>
