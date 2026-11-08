@@ -14,3 +14,12 @@ describe("reseller links", () => {
     expect(isLinkUsable({ expires_at: "2026-11-07T23:59:59Z", used_at: null }, now)).toBe(false);
   });
 });
+
+import { hashPassword, verifyPassword } from "./resellers";
+describe("reseller passwords", () => {
+  it("accept the right password and reject a wrong one", async () => {
+    const h = await hashPassword("segredo1");
+    expect(await verifyPassword("segredo1", h)).toBe(true);
+    expect(await verifyPassword("segredo2", h)).toBe(false);
+  });
+});
