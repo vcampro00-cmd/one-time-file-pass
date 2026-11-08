@@ -20,7 +20,7 @@ const filters: { value: DeviceStatus; label: string }[] = [
 ];
 
 export function DevicesPanel() {
-  const [filter, setFilter] = useState<DeviceStatus>("certified");
+  const [filter, setFilter] = useState<DeviceStatus>("installed");
   const qc = useQueryClient();
   const devices = useQuery({
     queryKey: ["devices"],
