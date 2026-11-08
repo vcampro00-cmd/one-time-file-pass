@@ -79,7 +79,11 @@ export const createResellerLink = createServerFn({ method: "POST" })
   });
 
 export const MAX_CREDITS_PER_PURCHASE = 50;
-const RESELLER_CREDIT_PRICE_ID = "reseller_credit_eur";
+// Own Stripe product ("Crédits revendeur VCAMPRO"), so checkout never shows the access-code name.
+const RESELLER_CREDIT_PRICE_ID = "reseller_credit_pack_eur";
+// Older credit price lived on the access-code product; still accepted so a purchase started
+// before the switch is credited.
+const RESELLER_CREDIT_PRICE_IDS = [RESELLER_CREDIT_PRICE_ID, "reseller_credit_eur"];
 
 // Public: reseller buys prepaid credits (promo: 1 free per 3 paid) for their own account.
 export const createResellerCreditCheckout = createServerFn({ method: "POST" })
