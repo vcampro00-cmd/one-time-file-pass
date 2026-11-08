@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { Copy, LogIn, LogOut, Plus, ShoppingCart, Smartphone } from "lucide-react";
+import { Copy, KeyRound, LogIn, LogOut, Plus, ShoppingCart, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { claimResellerCredits, createResellerCreditCheckout, MAX_CREDITS_PER_PURCHASE, createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
+import { claimResellerCredits, changeResellerPassword, createResellerCreditCheckout, MAX_CREDITS_PER_PURCHASE, createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
 import { creditsWithBonus, isLinkUsable, RESELLER_CREDIT_PRICE_EUR } from "@/lib/resellers";
 
 export const Route = createFileRoute("/revendeur")({
@@ -36,7 +36,11 @@ const SESSION_KEY = "vcampro-reseller-session";
 
 function ResellerPanel() {
   const [session, setSession] = useState<string | null | undefined>(undefined);
-  useEffect(() => { setSession(localStorage.getItem(SESSION_KEY)); }, []);
+  useEffect(() => {
+    const as = new URLSearchParams(window.location.search).get("as");
+    if (as && /^[0-9a-f]{32}$/.test(as)) { window.history.replaceState(null, "", "/revendeur"); localStorage.setItem(SESSION_KEY, as); setSession(as); return; }
+    setSession(localStorage.getItem(SESSION_KEY));
+  }, []);
   if (session === undefined) return <main className="p-10 text-center text-muted-foreground">Chargement…</main>;
   if (!session) return <Login onLogin={(s) => { localStorage.setItem(SESSION_KEY, s); setSession(s); }} />;
   return <Panel session={session} onLogout={() => { localStorage.removeItem(SESSION_KEY); setSession(null); }} />;
@@ -128,6 +132,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
       </header>
 
       <BuyCredits session={key} />
+      <ChangePassword session={key} />
 
       <section className="space-y-3 rounded-lg border border-border p-5">
         <h2 className="flex items-center gap-2 font-semibold"><Smartphone className="size-5" /> Nouvel appareil</h2>
@@ -192,5 +197,34 @@ function BuyCredits({ session }: { session: string }) {
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+function ChangePassword({ session }: { session: string }) {
+  const change = useServerFn(changeResellerPassword);
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const r = await change({ data: { session, current, next } });
+    setBusy(false);
+    if (!r.ok) { toast.error(r.error); return; }
+    toast.success("Mot de passe modifié");
+    setCurrent(""); setNext(""); setOpen(false);
+  }
+  if (!open) return <Button variant="outline" size="sm" onClick={() => setOpen(true)}><KeyRound /> Changer mon mot de passe</Button>;
+  return (
+    <form onSubmit={submit} className="space-y-2 rounded-lg border border-border p-5">
+      <h2 className="flex items-center gap-2 font-semibold"><KeyRound className="size-5" /> Changer mon mot de passe</h2>
+      <Input type="password" autoComplete="current-password" placeholder="Mot de passe actuel" value={current} onChange={(e) => setCurrent(e.target.value)} />
+      <Input type="password" autoComplete="new-password" placeholder="Nouveau mot de passe" value={next} onChange={(e) => setNext(e.target.value)} />
+      <div className="flex gap-2">
+        <Button type="submit" variant="brand" disabled={busy || !current || !next}>Enregistrer</Button>
+        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Annuler</Button>
+      </div>
+    </form>
   );
 }

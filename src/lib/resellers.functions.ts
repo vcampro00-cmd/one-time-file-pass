@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { creditsWithBonus, isHex32, linkExpiry, normalizeUsername, randomHex, sessionExpiry, sha256Hex, verifyPassword } from "@/lib/resellers";
 
 async function admin() {
@@ -137,4 +138,38 @@ export const claimResellerCredits = createServerFn({ method: "POST" })
     } catch (e) {
       return { ok: false as const, error: getStripeErrorMessage(e) };
     }
+  });
+
+// Public: reseller changes their own password (requires the current one).
+export const changeResellerPassword = createServerFn({ method: "POST" })
+  .validator((input: { session: string; current: string; next: string }) => ({
+    ...sessionInput(input),
+    current: String(input?.current ?? "").slice(0, 200),
+    next: String(input?.next ?? "").slice(0, 200),
+  }))
+  .handler(async ({ data }) => {
+    const { hashPassword, MIN_PASSWORD_LENGTH } = await import("@/lib/resellers");
+    const r = await resellerFromSession(data.session);
+    if (!r) return { ok: false as const, error: "Session expirée, reconnectez-vous" };
+    if (data.next.length < MIN_PASSWORD_LENGTH) return { ok: false as const, error: `${MIN_PASSWORD_LENGTH} caractères minimum` };
+    const db = await admin();
+    const { data: row } = await db.from("resellers").select("password_hash").eq("id", r.id).maybeSingle();
+    if (!(await verifyPassword(data.current, row?.password_hash))) return { ok: false as const, error: "Mot de passe actuel incorrect" };
+    const { error } = await db.from("resellers").update({ password_hash: await hashPassword(data.next) }).eq("id", r.id);
+    return error ? { ok: false as const, error: "Erreur, réessayez" } : { ok: true as const };
+  });
+
+// Owner: opens a short session on a reseller's panel. RLS on resellers (operators only) authorizes the caller.
+export const openResellerPanelAsOwner = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: { resellerId: string }) => {
+    if (!/^[0-9a-f-]{36}$/.test(String(input?.resellerId))) throw new Error("Revendeur invalide");
+    return { resellerId: input.resellerId };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: visible } = await context.supabase.from("resellers").select("id").eq("id", data.resellerId).maybeSingle();
+    if (!visible) return { ok: false as const, error: "Accès refusé" };
+    const session = randomHex();
+    const { error } = await (await admin()).from("reseller_sessions").insert({ token_hash: await sha256Hex(session), reseller_id: data.resellerId, expires_at: new Date(Date.now() + 3600_000).toISOString() });
+    return error ? { ok: false as const, error: "Erreur" } : { ok: true as const, session };
   });
