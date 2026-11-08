@@ -201,7 +201,7 @@ function BuyCredits({ session }: { session: string }) {
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
-          <DialogHeader><DialogTitle>{creditsWithBonus(qty)} crédits — {qty * RESELLER_CREDIT_PRICE_EUR} €</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} — {qty * RESELLER_CREDIT_PRICE_EUR} €</DialogTitle></DialogHeader>
           {open && (
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
               <EmbeddedCheckout />
