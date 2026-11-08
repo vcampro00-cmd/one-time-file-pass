@@ -140,7 +140,7 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
                   <span className="text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}</span>
                   <span>{d.product}{d.serial ? ` · Série ${d.serial}` : ""}</span>
                   {end && <span className={end.getTime() < Date.now() ? "text-destructive" : "text-muted-foreground"}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}</span>}
-                  <Badge variant={st === "certified" ? "default" : "outline"} className="ml-auto">{st === "certified" ? "Certifié" : st === "pending" ? "En attente" : "Annulé"}</Badge>
+                  <Badge variant={st === "installed" ? "default" : "outline"} className="ml-auto">{st === "installed" ? "Installé" : st === "certified" ? "Certifié" : st === "pending" ? "En attente" : "Annulé"}</Badge>
                 </li>
               );
             })}
