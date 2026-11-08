@@ -244,6 +244,35 @@ export type Database = {
         }
         Relationships: []
       }
+      reseller_credit_purchases: {
+        Row: {
+          created_at: string
+          credits: number
+          reseller_id: string | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits: number
+          reseller_id?: string | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          reseller_id?: string | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_credit_purchases_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reseller_links: {
         Row: {
           created_at: string
@@ -417,6 +446,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_reseller_credits: {
+        Args: { _qty: number; _reseller: string; _session: string }
+        Returns: boolean
+      }
       consume_reseller_credit: {
         Args: {
           _expires: string
