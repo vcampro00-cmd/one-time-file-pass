@@ -4,12 +4,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { Copy, LogIn, LogOut, Plus, Smartphone } from "lucide-react";
+import { Copy, LogIn, LogOut, Plus, ShoppingCart, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/brand-logo";
-import { createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { claimResellerCredits, createResellerCreditCheckout, MAX_CREDITS_PER_PURCHASE, createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
 import { isLinkUsable } from "@/lib/resellers";
 
 export const Route = createFileRoute("/revendeur")({
@@ -93,6 +96,18 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
     qc.invalidateQueries({ queryKey: ["reseller", key] });
   }
 
+  const claim = useServerFn(claimResellerCredits);
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("credits_session");
+    if (!id) return;
+    window.history.replaceState(null, "", "/revendeur");
+    claim({ data: { session: key, checkoutId: id, environment: getStripeEnvironment() } }).then((r) => {
+      if (!r.ok) toast.error(r.error);
+      else if (r.added > 0) toast.success(`${r.added} crédit${r.added > 1 ? "s" : ""} ajouté${r.added > 1 ? "s" : ""}`);
+      qc.invalidateQueries({ queryKey: ["reseller", key] });
+    });
+  }, []);
+
   if (panel.isLoading) return <main className="p-10 text-center text-muted-foreground">Chargement…</main>;
   const p = panel.data;
   if (!p) return <main className="space-y-4 p-10 text-center"><p>Session expirée ou compte désactivé.</p><Button variant="brand" onClick={onLogout}><LogIn /> Se reconnecter</Button></main>;
@@ -111,6 +126,8 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
           <p className="text-xs text-muted-foreground">crédit{p.credits > 1 ? "s" : ""}</p>
         </div>
       </header>
+
+      <BuyCredits session={key} />
 
       <section className="space-y-3 rounded-lg border border-border p-5">
         <h2 className="flex items-center gap-2 font-semibold"><Smartphone className="size-5" /> Nouvel appareil</h2>
@@ -143,5 +160,36 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
         </ul>
       </section>
     </main>
+  );
+}
+
+function BuyCredits({ session }: { session: string }) {
+  const [qty, setQty] = useState(5);
+  const [open, setOpen] = useState(false);
+  const start = useServerFn(createResellerCreditCheckout);
+  const fetchClientSecret = async () => {
+    const r = await start({ data: { session, quantity: qty, environment: getStripeEnvironment(), returnUrl: `${window.location.origin}/revendeur?credits_session={CHECKOUT_SESSION_ID}` } });
+    if ("error" in r) throw new Error(r.error);
+    return r.clientSecret;
+  };
+  return (
+    <section className="space-y-3 rounded-lg border border-border p-5">
+      <h2 className="flex items-center gap-2 font-semibold"><ShoppingCart className="size-5" /> Acheter des crédits</h2>
+      <p className="text-sm text-muted-foreground">50 € par crédit. Les crédits sont ajoutés dès le paiement confirmé.</p>
+      <div className="flex gap-2">
+        <Input type="number" min={1} max={MAX_CREDITS_PER_PURCHASE} aria-label="Nombre de crédits" className="w-24" value={qty} onChange={(e) => setQty(Math.min(MAX_CREDITS_PER_PURCHASE, Math.max(1, Number(e.target.value) || 1)))} />
+        <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> Acheter {qty} crédit{qty > 1 ? "s" : ""} — {qty * 50} €</Button>
+      </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+          <DialogHeader><DialogTitle>{qty} crédit{qty > 1 ? "s" : ""} — {qty * 50} €</DialogTitle></DialogHeader>
+          {open && (
+            <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          )}
+        </DialogContent>
+      </Dialog>
+    </section>
   );
 }
