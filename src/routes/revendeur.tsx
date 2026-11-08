@@ -152,6 +152,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
           <div className="space-y-3 pt-2 text-center">
             {qr && <img src={qr} alt="QR code de certification" className="mx-auto rounded-md bg-foreground p-2" width={240} height={240} />}
             <p className="text-sm text-muted-foreground">Scannez avec l'appareil photo de l'iPhone ou envoyez le lien.</p>
+            <p className="select-all break-all rounded-md border border-border bg-muted/40 px-3 py-2 font-mono text-sm">{urlOf(current)}</p>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(urlOf(current)); toast.success("Lien copié"); }}><Copy /> Copier le lien</Button>
           </div>
         )}
