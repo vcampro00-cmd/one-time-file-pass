@@ -79,7 +79,11 @@ export const createResellerLink = createServerFn({ method: "POST" })
   });
 
 export const MAX_CREDITS_PER_PURCHASE = 50;
-const RESELLER_CREDIT_PRICE_ID = "reseller_credit_eur";
+// Own Stripe product ("Crédits revendeur VCAMPRO"), so checkout never shows the access-code name.
+const RESELLER_CREDIT_PRICE_ID = "reseller_credit_pack_eur";
+// Older credit price lived on the access-code product; still accepted so a purchase started
+// before the switch is credited.
+const RESELLER_CREDIT_PRICE_IDS = [RESELLER_CREDIT_PRICE_ID, "reseller_credit_eur"];
 
 // Public: reseller buys prepaid credits (promo: 1 free per 3 paid) for their own account.
 export const createResellerCreditCheckout = createServerFn({ method: "POST" })
@@ -130,7 +134,7 @@ export const claimResellerCredits = createServerFn({ method: "POST" })
       if (s.metadata?.["kind"] !== "reseller_credits" || s.metadata?.["reseller_id"] !== r.id) return { ok: false as const, error: "Achat introuvable" };
       if (s.payment_status !== "paid") return { ok: false as const, error: "Paiement non confirmé" };
       const items = await stripe.checkout.sessions.listLineItems(data.checkoutId, { limit: 5 });
-      const qty = items.data.filter((i) => i.price?.lookup_key === RESELLER_CREDIT_PRICE_ID).reduce((n, i) => n + (i.quantity ?? 0), 0);
+      const qty = items.data.filter((i) => RESELLER_CREDIT_PRICE_IDS.includes(i.price?.lookup_key ?? "")).reduce((n, i) => n + (i.quantity ?? 0), 0);
       if (qty < 1) return { ok: false as const, error: "Achat introuvable" };
       const { data: added, error } = await (await admin()).rpc("add_reseller_credits", { _session: data.checkoutId, _reseller: r.id, _qty: creditsWithBonus(qty) });
       if (error) return { ok: false as const, error: "Erreur, réessayez" };

@@ -28,3 +28,4 @@
 - [ ] VCAMPRO home-screen app: VCAMPRO_App_1.2.deb built (arm64: choose, preview, rotate 90°, mirror, disable; only edits temp.mov). Untested on iPhone; waiting on owner test.
 - [x] Device certification: /appareil captures UDID, owner panel lists devices and publishes signed IPA, client gets 1-click install. Real iPhone test pending after publish.
 - [x] Reseller panel with prepaid credits, QR/link certification (1 credit per device, 5-month warranty); owner manages resellers and credits in admin. Real iPhone scan pending.
+- [x] Credit purchase checkout shows its own item name "Crédits revendeur VCAMPRO" (own Stripe product/price, tax code set, both payment modes) instead of the access-code name; embedded checkout rendered and verified in preview.
