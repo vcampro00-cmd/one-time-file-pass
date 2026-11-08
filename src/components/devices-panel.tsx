@@ -10,10 +10,11 @@ import { readIpaInfo } from "@/lib/ipa-info";
 import { RESELLER_WARRANTY_MONTHS, warrantyEnd } from "@/lib/warranty";
 import { deviceStatus, type DeviceStatus } from "@/lib/device-status";
 
-type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; resellers: { name: string } | null };
+type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; installed_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; resellers: { name: string } | null };
 
 const filters: { value: DeviceStatus; label: string }[] = [
-  { value: "certified", label: "Certifiés" },
+  { value: "installed", label: "Prêts (installés)" },
+  { value: "certified", label: "Certifiés · non installés" },
   { value: "pending", label: "En attente" },
   { value: "cancelled", label: "Annulés" },
 ];
@@ -24,7 +25,7 @@ export function DevicesPanel() {
   const devices = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, cancelled_at, app_name, created_at, reseller, resellers(name)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, installed_at, cancelled_at, app_name, created_at, reseller, resellers(name)").order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as Row[];
     },
@@ -104,7 +105,7 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
         <span className="font-mono text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")} · {d.product} · iOS {d.ios_version}{d.serial ? ` · Série ${d.serial}` : ""}</span>
         {d.ready_at && (() => { const end = warrantyEnd(new Date(d.ready_at), d.reseller ? RESELLER_WARRANTY_MONTHS : undefined); const expired = end.getTime() < Date.now(); return <span className={`font-mono text-xs ${expired ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}{expired ? " · EXPIRÉE" : ""}</span>; })()}
         {d.reseller && <Badge variant="outline" className="border-primary text-primary">Revendeur{d.resellers?.name ? ` · ${d.resellers.name}` : ""}</Badge>}
-        <Badge variant={deviceStatus(d) === "certified" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
+        <Badge variant={deviceStatus(d) === "installed" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
         <Button size="icon" variant="ghost" className="ml-auto" asChild aria-label="Ouvrir la page client"><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>
         <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}>{d.cancelled_at ? <RotateCcw /> : <Ban />}{d.cancelled_at ? "Réactiver" : "Annuler"}</Button>
       </div>

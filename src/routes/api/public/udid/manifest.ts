@@ -14,6 +14,8 @@ export const Route = createFileRoute("/api/public/udid/manifest")({
         if (!d || !canInstallDevice(d) || !d.ipa_path) return new Response("Not found", { status: 404 });
         const { data: signed } = await supabaseAdmin.storage.from("files").createSignedUrl(d.ipa_path, 3600);
         if (!signed) return new Response("Not found", { status: 404 });
+        // The iPhone fetches this manifest only when the client confirms installation.
+        if (!d.installed_at) await supabaseAdmin.from("devices").update({ installed_at: new Date().toISOString() }).eq("id", d.id);
         return new Response(
           buildManifest({
             ipaUrl: signed.signedUrl,
