@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Show reseller-device warranty end dates, five months from certification, in the reseller panel; verify date calculation and signed-in display.
+- [x] Show reseller-device warranty end dates, five months from successful profile certification (used_at), in reseller history; expired dates turn red with EXPIRÉE. Eleven tests passed and actual signed-in reseller date verified on desktop/mobile (08/11/2026 → 08/04/2027). Existing credit-purchase button mobile overflow is outside this request; no publishing performed.
 
 - [x] Organize administrator workspace into devices, code generator and customer settings; certified/pending/cancelled filters, cancellation/reactivation persistence, blocked cancelled manifest/client view and actual code generation verified with owner session. Eleven tests passed; desktop/mobile checked without runtime errors. No publishing performed.
 
