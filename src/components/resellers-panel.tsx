@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronDown, ChevronUp, KeyRound, Minus, Plus, UserPlus } from "lucide-react";
+import { ChevronDown, ChevronUp, KeyRound, Minus, Plus, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,12 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
     toast.success("Mot de passe modifié");
   }
 
+  async function remove() {
+    if (!window.confirm(`Supprimer définitivement le revendeur ${r.name} ? Ses appareils restent dans la liste.`)) return;
+    const { error } = await supabase.from("resellers").delete().eq("id", r.id);
+    if (error) toast.error("Échec de la suppression"); else { toast.success("Revendeur supprimé"); onChange(); }
+  }
+
   return (
     <li className="space-y-3 py-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -107,6 +113,7 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
         <Button size="sm" variant="outline" onClick={() => update({ credits: r.credits + 10 })}>+10</Button>
         <Button size="sm" variant="ghost" onClick={newPassword}><KeyRound /> Mot de passe</Button>
         <Button size="sm" variant="ghost" onClick={() => update({ active: !r.active })}>{r.active ? "Désactiver" : "Activer"}</Button>
+        <Button size="sm" variant="ghost" className="text-destructive" onClick={remove}><Trash2 /> Supprimer</Button>
       </div>
       {open && (
         <div className="ml-6 rounded-md border border-border p-3">
