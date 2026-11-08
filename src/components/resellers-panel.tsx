@@ -32,14 +32,14 @@ export function ResellersPanel() {
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const u = normalizeUsername(username);
-    if (!name.trim()) return toast.error("Indiquez le nom");
-    if (!isValidUsername(u)) return toast.error("Identifiant : 3 à 32 lettres, chiffres, . _ -");
-    if (password.length < MIN_PASSWORD_LENGTH) return toast.error(`Mot de passe : ${MIN_PASSWORD_LENGTH} caractères minimum`);
+    if (!name.trim()) { toast.error("Indiquez le nom"); return; }
+    if (!isValidUsername(u)) { toast.error("Identifiant : 3 à 32 lettres, chiffres, . _ -"); return; }
+    if (password.length < MIN_PASSWORD_LENGTH) { toast.error(`Mot de passe : ${MIN_PASSWORD_LENGTH} caractères minimum`); return; }
     const { error } = await supabase.from("resellers").insert({
       name: name.trim(), username: u, password_hash: await hashPassword(password),
       credits: Math.max(0, credits), access_key_hash: await sha256Hex(randomHex()),
     });
-    if (error) return toast.error(error.code === "23505" ? "Identifiant déjà utilisé" : "Échec de la création");
+    if (error) { toast.error(error.code === "23505" ? "Identifiant déjà utilisé" : "Échec de la création"); return; }
     navigator.clipboard?.writeText(`${loginUrl}\nIdentifiant : ${u}\nMot de passe : ${password}`).catch(() => {});
     toast.success("Revendeur créé — accès copiés");
     setName(""); setUsername(""); setPassword("");
@@ -87,7 +87,7 @@ function ResellerRow({ r, onChange }: { r: Reseller; onChange: () => void }) {
   async function newPassword() {
     const p = window.prompt(`Nouveau mot de passe pour ${r.name} :`);
     if (!p) return;
-    if (p.length < MIN_PASSWORD_LENGTH) return toast.error(`${MIN_PASSWORD_LENGTH} caractères minimum`);
+    if (p.length < MIN_PASSWORD_LENGTH) { toast.error(`${MIN_PASSWORD_LENGTH} caractères minimum`); return; }
     await update({ password_hash: await hashPassword(p) });
     toast.success("Mot de passe modifié");
   }
