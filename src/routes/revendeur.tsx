@@ -90,7 +90,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
   const [busy, setBusy] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [qr, setQr] = useState<string | null>(null);
-  const urlOf = (t: string) => `${window.location.origin}/api/public/udid/profile?rl=${t}`;
+  const urlOf = (code: string) => `${window.location.origin}/c/${code}`;
 
   useEffect(() => {
     if (!current) { setQr(null); return; }
@@ -102,7 +102,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
     const res = await create({ data: { session: key, label } });
     setBusy(false);
     if (!res.ok) { toast.error(res.error); return; }
-    setCurrent(res.token);
+    setCurrent(res.short_code);
     setLabel("");
     qc.invalidateQueries({ queryKey: ["reseller", key] });
   }
@@ -169,7 +169,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
               <span className="font-mono text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("fr-FR")}</span>
               <span>{l.label || "—"}</span>
               <Badge variant={l.used_at ? "default" : "outline"} className="ml-auto">{l.used_at ? "Certifié" : isLinkUsable(l) ? "En attente" : "Expiré"}</Badge>
-              {isLinkUsable(l) && <Button size="sm" variant="ghost" onClick={() => setCurrent(l.token)}>QR</Button>}
+              {isLinkUsable(l) && <Button size="sm" variant="ghost" onClick={() => setCurrent(l.short_code)}>QR</Button>}
               {end && (
                 <div className={`w-full font-mono text-xs ${expired ? "text-destructive" : "text-muted-foreground"}`}>
                   <span>Certifié le {new Date(l.used_at ?? "").toLocaleDateString("fr-FR")}</span>
