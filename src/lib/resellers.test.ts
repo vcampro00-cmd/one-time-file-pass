@@ -23,3 +23,11 @@ describe("reseller passwords", () => {
     expect(await verifyPassword("segredo2", h)).toBe(false);
   });
 });
+
+import { creditsWithBonus as cwb } from "./resellers";
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+d2("reseller credit promo", () => {
+  i2("3 paid gives 4 credits", () => e2(cwb(3)).toBe(4));
+  i2("2 paid gives 2 credits", () => e2(cwb(2)).toBe(2));
+  i2("6 paid gives 8 credits", () => e2(cwb(6)).toBe(8));
+});
