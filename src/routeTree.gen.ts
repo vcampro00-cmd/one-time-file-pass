@@ -22,6 +22,7 @@ import { Route as AuthenticatedGestionLicencesRouteImport } from './routes/_auth
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AchatRetourRouteImport } from './routes/achat.retour'
 import { Route as AppareilTokenRouteImport } from './routes/appareil.$token'
+import { Route as CCodeRouteImport } from './routes/c/$code'
 import { Route as GarantieTokenRouteImport } from './routes/garantie.$token'
 import { Route as LicencesRetourRouteImport } from './routes/licences_.retour'
 import { Route as ApiPublicDnsProfileRouteImport } from './routes/api/public/dns-profile'
@@ -96,6 +97,11 @@ const AppareilTokenRoute = AppareilTokenRouteImport.update({
   path: '/$token',
   getParentRoute: () => AppareilRoute,
 } as any)
+const CCodeRoute = CCodeRouteImport.update({
+  id: '/c/$code',
+  path: '/c/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GarantieTokenRoute = GarantieTokenRouteImport.update({
   id: '/garantie/$token',
   path: '/garantie/$token',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/c/$code': typeof CCodeRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/c/$code': typeof CCodeRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/achat/retour': typeof AchatRetourRoute
   '/appareil/$token': typeof AppareilTokenRoute
+  '/c/$code': typeof CCodeRoute
   '/garantie/$token': typeof GarantieTokenRoute
   '/licences_/retour': typeof LicencesRetourRoute
   '/api/public/dns-profile': typeof ApiPublicDnsProfileRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/c/$code'
     | '/garantie/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/c/$code'
     | '/garantie/$token'
     | '/licences/retour'
     | '/api/public/dns-profile'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel'
     | '/achat/retour'
     | '/appareil/$token'
+    | '/c/$code'
     | '/garantie/$token'
     | '/licences_/retour'
     | '/api/public/dns-profile'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   RevendeurRoute: typeof RevendeurRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AchatRetourRoute: typeof AchatRetourRoute
+  CCodeRoute: typeof CCodeRoute
   GarantieTokenRoute: typeof GarantieTokenRoute
   LicencesRetourRoute: typeof LicencesRetourRoute
   ApiPublicDnsProfileRoute: typeof ApiPublicDnsProfileRoute
@@ -390,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppareilTokenRouteImport
       parentRoute: typeof AppareilRoute
     }
+    '/c/$code': {
+      id: '/c/$code'
+      path: '/c/$code'
+      fullPath: '/c/$code'
+      preLoaderRoute: typeof CCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/garantie/$token': {
       id: '/garantie/$token'
       path: '/garantie/$token'
@@ -485,6 +505,7 @@ const rootRouteChildren: RootRouteChildren = {
   RevendeurRoute: RevendeurRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AchatRetourRoute: AchatRetourRoute,
+  CCodeRoute: CCodeRoute,
   GarantieTokenRoute: GarantieTokenRoute,
   LicencesRetourRoute: LicencesRetourRoute,
   ApiPublicDnsProfileRoute: ApiPublicDnsProfileRoute,

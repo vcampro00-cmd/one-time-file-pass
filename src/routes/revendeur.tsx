@@ -90,7 +90,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
   const [busy, setBusy] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [qr, setQr] = useState<string | null>(null);
-  const urlOf = (t: string) => `${window.location.origin}/api/public/udid/profile?rl=${t}`;
+  const urlOf = (code: string) => `${window.location.origin}/c/${code}`;
 
   useEffect(() => {
     if (!current) { setQr(null); return; }
@@ -102,7 +102,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
     const res = await create({ data: { session: key, label } });
     setBusy(false);
     if (!res.ok) { toast.error(res.error); return; }
-    setCurrent(res.token);
+    setCurrent(res.short_code);
     setLabel("");
     qc.invalidateQueries({ queryKey: ["reseller", key] });
   }
@@ -152,6 +152,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
           <div className="space-y-3 pt-2 text-center">
             {qr && <img src={qr} alt="QR code de certification" className="mx-auto rounded-md bg-foreground p-2" width={240} height={240} />}
             <p className="text-sm text-muted-foreground">Scannez avec l'appareil photo de l'iPhone ou envoyez le lien.</p>
+            <p className="select-all break-all rounded-md border border-border bg-muted/40 px-3 py-2 font-mono text-sm">{urlOf(current)}</p>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(urlOf(current)); toast.success("Lien copié"); }}><Copy /> Copier le lien</Button>
           </div>
         )}
@@ -169,7 +170,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
               <span className="font-mono text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("fr-FR")}</span>
               <span>{l.label || "—"}</span>
               <Badge variant={l.used_at ? "default" : "outline"} className="ml-auto">{l.used_at ? "Certifié" : isLinkUsable(l) ? "En attente" : "Expiré"}</Badge>
-              {isLinkUsable(l) && <Button size="sm" variant="ghost" onClick={() => setCurrent(l.token)}>QR</Button>}
+              {isLinkUsable(l) && <Button size="sm" variant="ghost" onClick={() => setCurrent(l.short_code)}>QR</Button>}
               {end && (
                 <div className={`w-full font-mono text-xs ${expired ? "text-destructive" : "text-muted-foreground"}`}>
                   <span>Certifié le {new Date(l.used_at ?? "").toLocaleDateString("fr-FR")}</span>

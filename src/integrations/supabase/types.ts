@@ -279,6 +279,7 @@ export type Database = {
           expires_at: string
           label: string | null
           reseller_id: string
+          short_code: string
           token: string
           used_at: string | null
         }
@@ -287,6 +288,7 @@ export type Database = {
           expires_at: string
           label?: string | null
           reseller_id: string
+          short_code: string
           token: string
           used_at?: string | null
         }
@@ -295,6 +297,7 @@ export type Database = {
           expires_at?: string
           label?: string | null
           reseller_id?: string
+          short_code?: string
           token?: string
           used_at?: string | null
         }
@@ -459,15 +462,26 @@ export type Database = {
         }
         Returns: number
       }
-      consume_reseller_credit_for: {
-        Args: {
-          _expires: string
-          _label: string
-          _reseller: string
-          _token: string
-        }
-        Returns: number
-      }
+      consume_reseller_credit_for:
+        | {
+            Args: {
+              _expires: string
+              _label: string
+              _reseller: string
+              _token: string
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              _expires: string
+              _label: string
+              _reseller: string
+              _short_code: string
+              _token: string
+            }
+            Returns: number
+          }
       fulfill_vcampro_license: {
         Args: {
           p_code: string
