@@ -210,7 +210,7 @@ function BuyCredits({ session }: { session: string }) {
         <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> Payer {qty} — recevoir {creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} · {qty * RESELLER_CREDIT_PRICE_EUR} €</Button>
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+        <DialogContent className="max-h-[90vh] w-[calc(100vw-1rem)] max-w-lg overflow-x-hidden overflow-y-auto p-3 sm:p-6">
           <DialogHeader><DialogTitle>{creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} — {qty * RESELLER_CREDIT_PRICE_EUR} €</DialogTitle></DialogHeader>
           {open && (
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
