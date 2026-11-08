@@ -136,6 +136,7 @@ export type Database = {
           cancelled_at: string | null
           created_at: string
           id: string
+          installed_at: string | null
           ios_version: string | null
           ipa_path: string | null
           label: string | null
@@ -154,6 +155,7 @@ export type Database = {
           cancelled_at?: string | null
           created_at?: string
           id?: string
+          installed_at?: string | null
           ios_version?: string | null
           ipa_path?: string | null
           label?: string | null
@@ -172,6 +174,7 @@ export type Database = {
           cancelled_at?: string | null
           created_at?: string
           id?: string
+          installed_at?: string | null
           ios_version?: string | null
           ipa_path?: string | null
           label?: string | null
