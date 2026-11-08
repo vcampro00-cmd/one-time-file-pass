@@ -76,3 +76,65 @@ export const createResellerLink = createServerFn({ method: "POST" })
     if (left === -1) return { ok: false as const, error: "Crédits insuffisants" };
     return { ok: true as const, token, credits: left as number };
   });
+
+export const MAX_CREDITS_PER_PURCHASE = 50;
+const RESELLER_CREDIT_PRICE_ID = "access_code_reseller_eur";
+
+// Public: reseller buys prepaid credits (50 € each) for their own account.
+export const createResellerCreditCheckout = createServerFn({ method: "POST" })
+  .validator((input: { session: string; quantity: number; returnUrl: string; environment: "sandbox" | "live" }) => {
+    const q = Math.floor(Number(input?.quantity));
+    if (!(q >= 1 && q <= MAX_CREDITS_PER_PURCHASE)) throw new Error("Quantité invalide");
+    if (input?.environment !== "sandbox" && input?.environment !== "live") throw new Error("Environnement invalide");
+    return { ...sessionInput(input), quantity: q, returnUrl: String(input.returnUrl), environment: input.environment };
+  })
+  .handler(async ({ data }): Promise<{ clientSecret: string } | { error: string }> => {
+    const r = await resellerFromSession(data.session);
+    if (!r) return { error: "Session expirée, reconnectez-vous" };
+    const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
+    try {
+      const stripe = createStripeClient(data.environment);
+      const price = (await stripe.prices.list({ lookup_keys: [RESELLER_CREDIT_PRICE_ID] })).data[0];
+      if (!price) throw new Error("Prix introuvable");
+      const s = await stripe.checkout.sessions.create({
+        line_items: [{ price: price.id, quantity: data.quantity }],
+        mode: "payment",
+        ui_mode: "embedded_page",
+        locale: "fr",
+        return_url: data.returnUrl,
+        payment_intent_data: { description: `Crédits revendeur VCAMPRO × ${data.quantity}` },
+        managed_payments: { enabled: true },
+        metadata: { managed_payments: "true", kind: "reseller_credits", reseller_id: r.id },
+      } as never);
+      return { clientSecret: s.client_secret ?? "" };
+    } catch (e) {
+      return { error: getStripeErrorMessage(e) };
+    }
+  });
+
+// Public: credits a paid session to its reseller exactly once.
+export const claimResellerCredits = createServerFn({ method: "POST" })
+  .validator((input: { session: string; checkoutId: string; environment: "sandbox" | "live" }) => {
+    if (!/^cs_[A-Za-z0-9_]+$/.test(String(input?.checkoutId))) throw new Error("Session invalide");
+    if (input?.environment !== "sandbox" && input?.environment !== "live") throw new Error("Environnement invalide");
+    return { ...sessionInput(input), checkoutId: input.checkoutId, environment: input.environment };
+  })
+  .handler(async ({ data }) => {
+    const r = await resellerFromSession(data.session);
+    if (!r) return { ok: false as const, error: "Session expirée, reconnectez-vous" };
+    const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
+    try {
+      const stripe = createStripeClient(data.environment);
+      const s = await stripe.checkout.sessions.retrieve(data.checkoutId);
+      if (s.metadata?.["kind"] !== "reseller_credits" || s.metadata?.["reseller_id"] !== r.id) return { ok: false as const, error: "Achat introuvable" };
+      if (s.payment_status !== "paid") return { ok: false as const, error: "Paiement non confirmé" };
+      const items = await stripe.checkout.sessions.listLineItems(data.checkoutId, { limit: 5 });
+      const qty = items.data.filter((i) => i.price?.lookup_key === RESELLER_CREDIT_PRICE_ID).reduce((n, i) => n + (i.quantity ?? 0), 0);
+      if (qty < 1) return { ok: false as const, error: "Achat introuvable" };
+      const { data: added, error } = await (await admin()).rpc("add_reseller_credits", { _session: data.checkoutId, _reseller: r.id, _qty: qty });
+      if (error) return { ok: false as const, error: "Erreur, réessayez" };
+      return { ok: true as const, added: added ? qty : 0 };
+    } catch (e) {
+      return { ok: false as const, error: getStripeErrorMessage(e) };
+    }
+  });
