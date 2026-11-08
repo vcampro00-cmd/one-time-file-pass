@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Project rules
+- Reseller-panel warranty dates derive from reseller_links.used_at (successful profile certification), never from link creation or IPA publication, using the shared warranty helper to avoid starting coverage before certification.
 - License billing lives in its own routes, tables and operator role; never share download passwords or upload administration, because license validity is independent of file access.
 - Fulfill license payments atomically through the service-only SQL function after verifying the Stripe session and line-item lookup key; manual renewals extend the same license, so webhook retries cannot duplicate validity.
 - Download passwords are stored only as SHA-256 hashes and redeemed in a public server fn using the admin client; a code is reusable until expires_at (first use recorded in used_at) so a visitor session lasts the full window.

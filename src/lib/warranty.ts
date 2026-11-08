@@ -1,11 +1,18 @@
 export const WARRANTY_MONTHS = 3;
-// Resellers (50 € codes) get a longer warranty.
+// Reseller devices get a longer warranty.
 export const RESELLER_WARRANTY_MONTHS = 5;
 
 export function warrantyEnd(start: Date, months = WARRANTY_MONTHS) {
   const d = new Date(start);
   d.setMonth(d.getMonth() + months);
   return d;
+}
+
+export function resellerWarrantyEnd(certifiedAt: string | null) {
+  if (!certifiedAt) return null;
+  const start = new Date(certifiedAt);
+  if (Number.isNaN(start.getTime())) return null;
+  return warrantyEnd(start, RESELLER_WARRANTY_MONTHS);
 }
 
 // IMEI: 15 digits with a valid Luhn check digit.
