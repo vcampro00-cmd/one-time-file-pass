@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { claimResellerCredits, changeResellerPassword, createResellerCreditCheckout, MAX_CREDITS_PER_PURCHASE, createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
 import { creditsWithBonus, isLinkUsable, RESELLER_CREDIT_PRICE_EUR } from "@/lib/resellers";
+import { resellerWarrantyEnd } from "@/lib/warranty";
 
 export const Route = createFileRoute("/revendeur")({
   staticData: { sitemap: false },
@@ -154,14 +155,26 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
         <h2 className="font-semibold">Historique</h2>
         {p.links.length === 0 && <p className="text-sm text-muted-foreground">Aucun appareil pour l'instant.</p>}
         <ul className="divide-y divide-border">
-          {p.links.map((l) => (
+          {p.links.map((l) => {
+            const end = resellerWarrantyEnd(l.used_at);
+            const expired = end !== null && end.getTime() <= Date.now();
+            return (
             <li key={l.token} className="flex flex-wrap items-center gap-2 py-2 text-sm">
               <span className="font-mono text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("fr-FR")}</span>
               <span>{l.label || "—"}</span>
               <Badge variant={l.used_at ? "default" : "outline"} className="ml-auto">{l.used_at ? "Certifié" : isLinkUsable(l) ? "En attente" : "Expiré"}</Badge>
               {isLinkUsable(l) && <Button size="sm" variant="ghost" onClick={() => setCurrent(l.token)}>QR</Button>}
+              {end && (
+                <div className={`w-full font-mono text-xs ${expired ? "text-destructive" : "text-muted-foreground"}`}>
+                  <span>Certifié le {new Date(l.used_at ?? "").toLocaleDateString("fr-FR")}</span>
+                  <span className="mx-2">·</span>
+                  <span>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}</span>
+                  {expired && <span className="ml-2 font-bold">EXPIRÉE</span>}
+                </div>
+              )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       </section>
     </main>
