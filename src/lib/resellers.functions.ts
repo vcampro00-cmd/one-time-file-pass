@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { isHex32, linkExpiry, normalizeUsername, randomHex, sessionExpiry, sha256Hex, verifyPassword } from "@/lib/resellers";
+import { creditsWithBonus, isHex32, linkExpiry, normalizeUsername, randomHex, sessionExpiry, sha256Hex, verifyPassword } from "@/lib/resellers";
 
 async function admin() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
@@ -78,9 +78,9 @@ export const createResellerLink = createServerFn({ method: "POST" })
   });
 
 export const MAX_CREDITS_PER_PURCHASE = 50;
-const RESELLER_CREDIT_PRICE_ID = "access_code_reseller_eur";
+const RESELLER_CREDIT_PRICE_ID = "reseller_credit_eur";
 
-// Public: reseller buys prepaid credits (50 € each) for their own account.
+// Public: reseller buys prepaid credits (promo: 1 free per 3 paid) for their own account.
 export const createResellerCreditCheckout = createServerFn({ method: "POST" })
   .validator((input: { session: string; quantity: number; returnUrl: string; environment: "sandbox" | "live" }) => {
     const q = Math.floor(Number(input?.quantity));
@@ -131,9 +131,9 @@ export const claimResellerCredits = createServerFn({ method: "POST" })
       const items = await stripe.checkout.sessions.listLineItems(data.checkoutId, { limit: 5 });
       const qty = items.data.filter((i) => i.price?.lookup_key === RESELLER_CREDIT_PRICE_ID).reduce((n, i) => n + (i.quantity ?? 0), 0);
       if (qty < 1) return { ok: false as const, error: "Achat introuvable" };
-      const { data: added, error } = await (await admin()).rpc("add_reseller_credits", { _session: data.checkoutId, _reseller: r.id, _qty: qty });
+      const { data: added, error } = await (await admin()).rpc("add_reseller_credits", { _session: data.checkoutId, _reseller: r.id, _qty: creditsWithBonus(qty) });
       if (error) return { ok: false as const, error: "Erreur, réessayez" };
-      return { ok: true as const, added: added ? qty : 0 };
+      return { ok: true as const, added: added ? creditsWithBonus(qty) : 0 };
     } catch (e) {
       return { ok: false as const, error: getStripeErrorMessage(e) };
     }

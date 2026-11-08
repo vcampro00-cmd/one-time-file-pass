@@ -13,7 +13,7 @@ import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { claimResellerCredits, createResellerCreditCheckout, MAX_CREDITS_PER_PURCHASE, createResellerLink, getResellerPanel, resellerLogin, resellerLogout } from "@/lib/resellers.functions";
-import { isLinkUsable } from "@/lib/resellers";
+import { creditsWithBonus, isLinkUsable, RESELLER_CREDIT_PRICE_EUR } from "@/lib/resellers";
 
 export const Route = createFileRoute("/revendeur")({
   staticData: { sitemap: false },
@@ -164,7 +164,7 @@ function Panel({ session, onLogout }: { session: string; onLogout: () => void })
 }
 
 function BuyCredits({ session }: { session: string }) {
-  const [qty, setQty] = useState(5);
+  const [qty, setQty] = useState(3);
   const [open, setOpen] = useState(false);
   const start = useServerFn(createResellerCreditCheckout);
   const fetchClientSecret = async () => {
@@ -175,14 +175,15 @@ function BuyCredits({ session }: { session: string }) {
   return (
     <section className="space-y-3 rounded-lg border border-border p-5">
       <h2 className="flex items-center gap-2 font-semibold"><ShoppingCart className="size-5" /> Acheter des crédits</h2>
-      <p className="text-sm text-muted-foreground">50 € par crédit. Les crédits sont ajoutés dès le paiement confirmé.</p>
+      <p className="rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">PROMO : 4 crédits pour le prix de 3 !</p>
+      <p className="text-sm text-muted-foreground">{RESELLER_CREDIT_PRICE_EUR} € par crédit. Pour 3 crédits payés, 1 offert. Ajoutés dès le paiement confirmé.</p>
       <div className="flex gap-2">
         <Input type="number" min={1} max={MAX_CREDITS_PER_PURCHASE} aria-label="Nombre de crédits" className="w-24" value={qty} onChange={(e) => setQty(Math.min(MAX_CREDITS_PER_PURCHASE, Math.max(1, Number(e.target.value) || 1)))} />
-        <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> Acheter {qty} crédit{qty > 1 ? "s" : ""} — {qty * 50} €</Button>
+        <Button variant="brand" className="flex-1" onClick={() => setOpen(true)}><ShoppingCart /> Payer {qty} — recevoir {creditsWithBonus(qty)} crédit{creditsWithBonus(qty) > 1 ? "s" : ""} · {qty * RESELLER_CREDIT_PRICE_EUR} €</Button>
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
-          <DialogHeader><DialogTitle>{qty} crédit{qty > 1 ? "s" : ""} — {qty * 50} €</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{creditsWithBonus(qty)} crédits — {qty * RESELLER_CREDIT_PRICE_EUR} €</DialogTitle></DialogHeader>
           {open && (
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
               <EmbeddedCheckout />

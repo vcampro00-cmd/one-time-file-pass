@@ -54,3 +54,7 @@ export function sessionExpiry(now = Date.now()): Date {
 export function isLinkUsable(l: { expires_at: string; used_at: string | null } | null | undefined, now = Date.now()): boolean {
   return !!l && !l.used_at && new Date(l.expires_at).getTime() > now;
 }
+
+// Reseller credits promotion: 40 € per credit, every 3 paid credits give 1 free ("4 pour le prix de 3").
+export const RESELLER_CREDIT_PRICE_EUR = 40;
+export const creditsWithBonus = (paid: number) => paid + Math.floor(paid / 3);
