@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, KeyRound, LogOut, Settings2, Smartphone, Trash2, Upload, Users } from "lucide-react";
+import { ArrowLeft, Copy, KeyRound, LogOut, Settings2, Smartphone, Trash2, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -134,9 +134,14 @@ function Painel() {
           <BrandLogo className="h-14 w-24 shrink-0 sm:h-16 sm:w-28" />
           <span className="hidden font-mono text-xs font-bold sm:block">TABLEAU DE BORD</span>
         </div>
-        <Button variant="ghost" size="sm" onClick={signOut}>
-          <LogOut /> Déconnexion
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/"><ArrowLeft /> Espace client</Link>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={signOut}>
+            <LogOut /> Déconnexion
+          </Button>
+        </div>
       </header>
 
       <div className="mx-auto max-w-5xl px-4 pb-16">
