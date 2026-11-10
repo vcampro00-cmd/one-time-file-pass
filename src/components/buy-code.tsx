@@ -39,11 +39,11 @@ export function BuyCode({ reseller = false }: { reseller?: boolean }) {
         </Button>
       ) : (
         <>
-          <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("7")}>
-            <ShoppingCart /> iPhone 7 — 70 €
-          </Button>
           <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("8")}>
             <ShoppingCart /> iPhone 8 — 95 €
+          </Button>
+          <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("7")}>
+            <ShoppingCart /> iPhone 7 — 70 €
           </Button>
         </>
       )}
