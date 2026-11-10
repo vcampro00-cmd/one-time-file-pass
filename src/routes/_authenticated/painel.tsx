@@ -170,6 +170,11 @@ function Painel() {
               <li key={f.id} className="flex items-center gap-3 py-3">
                 <Checkbox checked={selected.has(f.id)} onCheckedChange={() => toggle(f.id)} />
                 <span className="min-w-0 flex-1 truncate">{f.name}</span>
+                <select aria-label="Modèle" className="h-8 border border-border bg-background px-2 font-mono text-xs" value={f.model} onChange={async (e) => { const { error } = await supabase.from("files").update({ model: e.target.value }).eq("id", f.id); if (error) toast.error("Échec"); else { toast.success("Modèle mis à jour"); qc.invalidateQueries({ queryKey: ["files"] }); } }}>
+                  <option value="all">Tous iPhone</option>
+                  <option value="7">iPhone 7</option>
+                  <option value="8">iPhone 8</option>
+                </select>
                 <span className="font-mono text-xs text-muted-foreground">{(f.size / 1024 / 1024).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo</span>
                 <Button size="icon" variant="ghost" onClick={() => remove(f.id, f.storage_path)} aria-label="Supprimer">
                   <Trash2 />

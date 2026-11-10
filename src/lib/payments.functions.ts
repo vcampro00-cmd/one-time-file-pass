@@ -71,17 +71,19 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
 
     // Reseller purchase: the session was paid with the reseller price.
     let reseller = false;
+    let iphone8 = false;
     try {
       const items = await stripe.checkout.sessions.listLineItems(data.sessionId, { limit: 5 });
       reseller = items.data.some((i) => {
         const p = i.price;
         return p?.lookup_key === RESELLER_PRICE_ID;
       });
+      iphone8 = items.data.some((i) => i.price?.lookup_key === IPHONE8_PRICE_ID);
     } catch {
       reseller = false;
     }
 
-    const { data: files } = await supabaseAdmin.from("files").select("id, owner_id");
+    const { data: files } = await supabaseAdmin.from("files").select("id, owner_id").in("model", ["all", iphone8 ? "8" : "7"]);
     if (!files || files.length === 0) return { error: "Aucun fichier disponible pour le moment." };
 
     const code = generateCode();

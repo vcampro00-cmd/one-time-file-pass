@@ -212,6 +212,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          model: string
           name: string
           owner_id: string
           size: number
@@ -220,6 +221,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          model?: string
           name: string
           owner_id?: string
           size?: number
@@ -228,6 +230,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          model?: string
           name?: string
           owner_id?: string
           size?: number
