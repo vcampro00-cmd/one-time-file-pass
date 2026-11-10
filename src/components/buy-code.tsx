@@ -6,13 +6,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { createCodeCheckout } from "@/lib/payments.functions";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 
-function Checkout({ reseller }: { reseller: boolean }) {
+function Checkout({ reseller, iphone8 }: { reseller: boolean; iphone8: boolean }) {
   const fetchClientSecret = async () => {
     const r = await createCodeCheckout({
       data: {
         returnUrl: `${window.location.origin}/achat/retour?session_id={CHECKOUT_SESSION_ID}`,
         environment: getStripeEnvironment(),
         reseller,
+        iphone8,
       },
     });
     if ("error" in r) throw new Error(r.error);
@@ -26,22 +27,33 @@ function Checkout({ reseller }: { reseller: boolean }) {
 }
 
 export function BuyCode({ reseller = false }: { reseller?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const price = reseller ? "50 €" : "70 €";
+  const [open, setOpen] = useState<null | "7" | "8">(null);
+  const price = reseller ? "50 €" : open === "8" ? "95 €" : "70 €";
   const isTest = (import.meta.env["VITE_PAYMENTS_CLIENT_TOKEN"] as string | undefined)?.startsWith("pk_test_");
   return (
     <div className="space-y-2 border-t border-border pt-6">
       <p className="text-center text-sm text-muted-foreground">{reseller ? "Tarif revendeur" : "Pas de code ?"}</p>
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen(true)}>
-        <ShoppingCart /> Acheter un code — {price}
-      </Button>
+      {reseller ? (
+        <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("7")}>
+          <ShoppingCart /> Acheter un code — 50 €
+        </Button>
+      ) : (
+        <>
+          <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("7")}>
+            <ShoppingCart /> iPhone 7 — 70 €
+          </Button>
+          <Button type="button" variant="outline" size="lg" className="w-full" onClick={() => setOpen("8")}>
+            <ShoppingCart /> iPhone 8 — 95 €
+          </Button>
+        </>
+      )}
       {isTest && <p className="text-center text-xs text-muted-foreground">Mode test : aucun vrai paiement.</p>}
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Code d’accès 20 minutes — {price}</DialogTitle>
+            <DialogTitle><span key={price}>Code d’accès 20 minutes{reseller ? "" : open === "8" ? " · iPhone 8" : " · iPhone 7"} — {price}</span></DialogTitle>
           </DialogHeader>
-          {open && <Checkout reseller={reseller} />}
+          {open && <Checkout reseller={reseller} iphone8={open === "8"} />}
         </DialogContent>
       </Dialog>
     </div>
