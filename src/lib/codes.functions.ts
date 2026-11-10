@@ -9,7 +9,7 @@ import {
   isMasterCode,
   normalizeCode,
 } from "./codes";
-import { certifyUrl, profileUrl, signCertifyToken, signProfileToken } from "./profile-token";
+import { certifyUrl, profileUrl, signCertifyToken, signProfileToken, signPurchaseCertification } from "./profile-token";
 
 type StoredFile = { id: string; name: string; size: number; storage_path: string };
 type FileLink = { id: string; name: string; size: number; url: string };
@@ -128,5 +128,7 @@ export const redeemAccessCode = createServerFn({ method: "POST" })
       const f = l.files as unknown as StoredFile | null;
       if (f) rows.push(f);
     }
-    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), certifyUrl: await certifyLink(claimed.reseller), reseller: claimed.reseller, expiresAt: expiresAt as string | null };
+    const secret = process.env["DNS_PROFILE_SIGNING_SECRET"];
+    const certification = secret ? `/api/public/udid/profile?pc=${encodeURIComponent(await signPurchaseCertification(secret, claimed.id))}` : null;
+    return { ok: true as const, files: await sign(rows), profileUrl: await profileLink(), certifyUrl: certification, reseller: claimed.reseller, expiresAt: expiresAt as string | null };
   });

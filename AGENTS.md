@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Project rules
+- Bind purchased-code certification to its code ID with an expiring HMAC token; iPhone 8 follow-up downloads require the linked purchase, a manifest installation signal and an active device, and expose only model-compatible short-lived signed URLs.
 - Reseller-panel warranty dates derive from reseller_links.used_at (successful profile certification), never from link creation or IPA publication, using the shared warranty helper to avoid starting coverage before certification.
 - License billing lives in its own routes, tables and operator role; never share download passwords or upload administration, because license validity is independent of file access.
 - Fulfill license payments atomically through the service-only SQL function after verifying the Stripe session and line-item lookup key; manual renewals extend the same license, so webhook retries cannot duplicate validity.

@@ -86,11 +86,13 @@ export const claimPurchasedCode = createServerFn({ method: "POST" })
     const { data: files } = await supabaseAdmin.from("files").select("id, owner_id").in("model", ["all", iphone8 ? "8" : "7"]);
     if (!files || files.length === 0) return { error: "Aucun fichier disponible pour le moment." };
 
+    const firstFile = files[0];
+    if (!firstFile) return { error: "Aucun fichier disponible pour le moment." };
     const code = generateCode();
     const expiresAt = unusedExpiresAtFrom(new Date()).toISOString();
     const { data: row, error } = await supabaseAdmin
       .from("access_codes")
-      .insert({ owner_id: files[0]!.owner_id, code_hash: await hashCode(code), expires_at: expiresAt, reseller })
+      .insert({ owner_id: firstFile.owner_id, code_hash: await hashCode(code), expires_at: expiresAt, reseller, model: iphone8 ? "8" : "7" })
       .select("id")
       .single();
     if (error) return { error: "Erreur lors de la création du code." };

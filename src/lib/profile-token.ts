@@ -59,3 +59,18 @@ export async function verifyCertifyToken(secret: string, token: string, now = Da
 export function certifyUrl(token: string) {
   return `/api/public/udid/profile?ct=${encodeURIComponent(token)}`;
 }
+
+export async function signPurchaseCertification(secret: string, codeId: string, now = Date.now()): Promise<string> {
+  const exp = now + PROFILE_TOKEN_TTL_MS;
+  return `${exp}.${codeId}.${await hmac(secret, `purchase-certify:${exp}:${codeId}`)}`;
+}
+
+export async function verifyPurchaseCertification(secret: string, token: string, now = Date.now()): Promise<string | null> {
+  const [exp, id, sig, extra] = token.split(".");
+  if (!exp || !/^\d{1,15}$/.test(exp) || Number(exp) <= now || !id || !/^[0-9a-f-]{36}$/.test(id) || !sig || extra !== undefined) return null;
+  const expected = await hmac(secret, `purchase-certify:${exp}:${id}`);
+  if (expected.length !== sig.length) return null;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ sig.charCodeAt(i);
+  return diff === 0 ? id : null;
+}

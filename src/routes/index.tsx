@@ -50,6 +50,7 @@ function Index() {
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<FileLink[] | null>(null);
   const [profileHref, setProfileHref] = useState<string | null>(null);
+  const [certifyHref, setCertifyHref] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -57,6 +58,7 @@ function Index() {
     sessionStorage.removeItem(SESSION_KEY);
     setFiles(null);
     setProfileHref(null);
+    setCertifyHref(null);
     setExpiresAt(null);
     setCode("");
     setError(message);
@@ -74,6 +76,7 @@ function Index() {
         sessionStorage.setItem(SESSION_KEY, JSON.stringify({ code: c, expiresAt: res.expiresAt }));
         setFiles(res.files);
         setProfileHref(res.profileUrl);
+        setCertifyHref(res.certifyUrl);
         setExpiresAt(res.expiresAt);
         setNow(Date.now());
       }
@@ -243,7 +246,7 @@ function Index() {
                 <li>Votre appareil sera identifié. Gardez la page de confirmation : l'application y apparaîtra dès qu'elle sera prête.</li>
               </ol>
               <Button asChild variant="brand" className="h-11 w-full font-mono text-xs font-bold uppercase">
-                <a href="/api/public/udid/profile">
+                <a href={certifyHref ?? "/api/public/udid/profile"}>
                   <Smartphone className="h-4 w-4" /> Certifier l'appareil
                 </a>
               </Button>

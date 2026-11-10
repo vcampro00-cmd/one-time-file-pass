@@ -50,6 +50,7 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
+          model: string | null
           owner_id: string
           reseller: boolean
           used_at: string | null
@@ -59,6 +60,7 @@ export type Database = {
           created_at?: string
           expires_at: string
           id?: string
+          model?: string | null
           owner_id?: string
           reseller?: boolean
           used_at?: string | null
@@ -68,6 +70,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          model?: string | null
           owner_id?: string
           reseller?: boolean
           used_at?: string | null
@@ -130,6 +133,7 @@ export type Database = {
       }
       devices: {
         Row: {
+          access_code_id: string | null
           app_name: string | null
           app_version: string | null
           bundle_id: string | null
@@ -149,6 +153,7 @@ export type Database = {
           udid: string
         }
         Insert: {
+          access_code_id?: string | null
           app_name?: string | null
           app_version?: string | null
           bundle_id?: string | null
@@ -168,6 +173,7 @@ export type Database = {
           udid: string
         }
         Update: {
+          access_code_id?: string | null
           app_name?: string | null
           app_version?: string | null
           bundle_id?: string | null
@@ -187,6 +193,13 @@ export type Database = {
           udid?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "devices_access_code_id_fkey"
+            columns: ["access_code_id"]
+            isOneToOne: false
+            referencedRelation: "access_codes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "devices_reseller_id_fkey"
             columns: ["reseller_id"]
