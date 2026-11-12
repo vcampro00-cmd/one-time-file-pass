@@ -152,8 +152,11 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
             <span className="text-xs text-muted-foreground">{d.ios_version ? `iOS ${d.ios_version}` : ""}</span>
             <Badge variant="outline">{d.reseller ? d.resellers?.name ?? "Revendeur supprimé" : "Mon site"}</Badge>
           </div>
-          <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}{d.serial ? ` · Série ${d.serial}` : ""}{d.customer_phone ? ` · Tél. ${d.customer_phone}` : ""}</p>
-        {d.ready_at && (() => { const end = warrantyEnd(new Date(d.ready_at), d.reseller ? RESELLER_WARRANTY_MONTHS : undefined); const expired = end.getTime() < Date.now(); return <span className={`font-mono text-xs ${expired ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}{expired ? " · EXPIRÉE" : ""}</span>; })()}
+          <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}{d.serial ? ` · Série ${d.serial}` : ""}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {d.ready_at && (() => { const end = warrantyEnd(new Date(d.ready_at), d.reseller ? RESELLER_WARRANTY_MONTHS : undefined); const expired = end.getTime() < Date.now(); return <span className={`font-mono text-xs ${expired ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}{expired ? " · EXPIRÉE" : ""}</span>; })()}
+            {d.customer_phone && <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground"><Phone className="h-3 w-3 shrink-0" />{d.customer_phone}</span>}
+          </div>
         </div>
         <Button size="sm" variant="outline" aria-expanded={expanded} aria-controls={`device-${d.id}`} onClick={() => setExpanded(!expanded)}>Gérer <ChevronDown className={expanded ? "rotate-180" : ""} /></Button>
       </div>
