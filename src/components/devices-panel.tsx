@@ -100,6 +100,16 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
     onChange();
   }
 
+  async function remove() {
+    if (!window.confirm("Supprimer définitivement cet appareil ? Le client pourra le certifier à nouveau.")) return;
+    setBusy(true);
+    const { error } = await supabase.from("devices").delete().eq("id", d.id);
+    setBusy(false);
+    if (error) { toast.error("Impossible de supprimer"); return; }
+    toast.success("Appareil supprimé");
+    onChange();
+  }
+
   async function changeCancellation() {
     if (!d.cancelled_at && !window.confirm("Annuler cet appareil et désactiver son installation ?")) return;
     setBusy(true);
@@ -118,7 +128,8 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
         {d.reseller && <Badge variant="outline" className="border-primary text-primary">Revendeur{d.resellers?.name ? ` · ${d.resellers.name}` : ""}</Badge>}
         <Badge variant={deviceStatus(d) === "installed" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
         <Button size="icon" variant="ghost" className="ml-auto" asChild aria-label="Ouvrir la page client"><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>
-        <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}>{d.cancelled_at ? <RotateCcw /> : <Ban />}{d.cancelled_at ? "Réactiver" : "Annuler"}</Button>
+        {d.cancelled_at && <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}><RotateCcw /> Réactiver</Button>}
+        <Button size="sm" variant="outline" className="text-destructive" disabled={busy} onClick={remove}><Ban /> {d.cancelled_at ? "Supprimer" : "Annuler et supprimer"}</Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className="break-all font-mono text-sm">{d.udid}</span>
