@@ -10,7 +10,7 @@ import { readIpaInfo } from "@/lib/ipa-info";
 import { RESELLER_WARRANTY_MONTHS, warrantyEnd } from "@/lib/warranty";
 import { deviceStatus, type DeviceStatus } from "@/lib/device-status";
 
-type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; installed_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; resellers: { name: string } | null };
+type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; installed_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; reseller_id: string | null; resellers: { name: string } | null };
 
 const filters: { value: DeviceStatus; label: string }[] = [
   { value: "installed", label: "Prêts (installés)" },
@@ -21,16 +21,22 @@ const filters: { value: DeviceStatus; label: string }[] = [
 
 export function DevicesPanel() {
   const [filter, setFilter] = useState<DeviceStatus>("installed");
+  const [source, setSource] = useState<string>("all");
   const qc = useQueryClient();
   const devices = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, installed_at, cancelled_at, app_name, created_at, reseller, resellers(name)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, installed_at, cancelled_at, app_name, created_at, reseller, reseller_id, resellers(name)").order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as Row[];
     },
     refetchInterval: 15000,
   });
+  const sources = new Map<string, string>();
+  devices.data?.forEach((d) => { if (d.reseller) sources.set(d.reseller_id ?? "unknown", d.resellers?.name ?? "Revendeur supprimé"); });
+  const sourceOf = (d: Row) => (d.reseller ? d.reseller_id ?? "unknown" : "site");
+  const bySource = devices.data?.filter((d) => source === "all" || sourceOf(d) === source);
+  const sourceOptions = [{ value: "all", label: "Tous" }, { value: "site", label: "Mon site" }, ...[...sources].map(([value, name]) => ({ value, label: `Revendeur · ${name}` }))];
   const link = `${typeof window !== "undefined" ? window.location.origin : ""}/appareil`;
 
   return (
@@ -46,16 +52,21 @@ export function DevicesPanel() {
           </a>
         </Button>
       </div>
+      <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Origine des appareils">
+        {sourceOptions.map(({ value, label }) => <Button key={value} size="sm" variant={source === value ? "brand" : "outline"} aria-pressed={source === value} onClick={() => setSource(value)}>
+          {label} <span className="font-mono text-xs">{devices.data?.filter((d) => value === "all" || sourceOf(d) === value).length ?? 0}</span>
+        </Button>)}
+      </div>
       <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Statut des appareils">
         {filters.map(({ value, label }) => <Button key={value} variant={filter === value ? "brand" : "outline"} aria-pressed={filter === value} onClick={() => setFilter(value)}>
-          {label} <span className="font-mono text-xs">{devices.data?.filter((d) => deviceStatus(d) === value).length ?? 0}</span>
+          {label} <span className="font-mono text-xs">{bySource?.filter((d) => deviceStatus(d) === value).length ?? 0}</span>
         </Button>)}
       </div>
       {devices.isError && <p role="alert" className="py-4 text-destructive">Impossible de charger les appareils.</p>}
       <ul className="divide-y divide-border border-y border-border">
-        {devices.data?.filter((d) => deviceStatus(d) === filter).map((d) => <DeviceRow key={d.id} d={d} onChange={() => qc.invalidateQueries({ queryKey: ["devices"] })} />)}
+        {bySource?.filter((d) => deviceStatus(d) === filter).map((d) => <DeviceRow key={d.id} d={d} onChange={() => qc.invalidateQueries({ queryKey: ["devices"] })} />)}
         {devices.isPending && <li className="py-10 text-center text-muted-foreground">Chargement…</li>}
-        {devices.data && !devices.data.some((d) => deviceStatus(d) === filter) && <li className="py-12 text-center text-sm text-muted-foreground">Aucun appareil dans cette catégorie.</li>}
+        {bySource && !bySource.some((d) => deviceStatus(d) === filter) && <li className="py-12 text-center text-sm text-muted-foreground">Aucun appareil dans cette catégorie.</li>}
       </ul>
     </section>
   );
