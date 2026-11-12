@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Ban, Copy, ExternalLink, RotateCcw, Upload } from "lucide-react";
+import { Ban, ChevronDown, Copy, ExternalLink, RotateCcw, Smartphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { readIpaInfo } from "@/lib/ipa-info";
 import { RESELLER_WARRANTY_MONTHS, warrantyEnd } from "@/lib/warranty";
@@ -21,7 +22,7 @@ const filters: { value: DeviceStatus; label: string }[] = [
 
 export function DevicesPanel() {
   const [filter, setFilter] = useState<DeviceStatus>("installed");
-  const [source, setSource] = useState<string>("all");
+  const [source, setSource] = useState<string>("site");
   const qc = useQueryClient();
   const devices = useQuery({
     queryKey: ["devices"],
@@ -40,9 +41,9 @@ export function DevicesPanel() {
   const link = `${typeof window !== "undefined" ? window.location.origin : ""}/appareil`;
 
   return (
-    <section className="mx-auto max-w-5xl py-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="mr-auto text-2xl font-bold">Appareils</h2>
+    <section className="min-w-0 py-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="mr-auto text-2xl font-bold">Appareils</h1>
         <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Lien copié"); }}>
           <Copy /> Lien de certification
         </Button>
@@ -52,14 +53,20 @@ export function DevicesPanel() {
           </a>
         </Button>
       </div>
-      <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Origine des appareils">
-        {sourceOptions.map(({ value, label }) => <Button key={value} size="sm" variant={source === value ? "brand" : "outline"} aria-pressed={source === value} onClick={() => setSource(value)}>
-          {label} <span className="font-mono text-xs">{devices.data?.filter((d) => value === "all" || sourceOf(d) === value).length ?? 0}</span>
-        </Button>)}
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-y border-border py-4">
+        <div className="w-full max-w-sm space-y-2">
+          <label id="device-source-label" className="text-xs font-medium text-muted-foreground">Origine des appareils</label>
+          <Select value={source} onValueChange={setSource}>
+            <SelectTrigger aria-labelledby="device-source-label"><SelectValue /></SelectTrigger>
+            <SelectContent>{sourceOptions.map(({ value, label }) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <p className="text-sm text-muted-foreground" translate="no">{bySource?.length ?? 0} appareils</p>
       </div>
-      <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Statut des appareils">
-        {filters.map(({ value, label }) => <Button key={value} variant={filter === value ? "brand" : "outline"} aria-pressed={filter === value} onClick={() => setFilter(value)}>
-          {label} <span className="font-mono text-xs">{bySource?.filter((d) => deviceStatus(d) === value).length ?? 0}</span>
+      <div className="mb-6 grid grid-cols-2 gap-2 xl:grid-cols-4" role="group" aria-label="Statut des appareils">
+        {filters.map(({ value, label }) => <Button key={value} className="h-auto min-h-20 flex-col items-start whitespace-normal px-4 py-3 text-left" variant={filter === value ? "brand" : "outline"} aria-pressed={filter === value} onClick={() => setFilter(value)}>
+          <span className="font-mono text-2xl" translate="no">{bySource?.filter((d) => deviceStatus(d) === value).length ?? 0}</span>
+          <span className="text-xs">{label}</span>
         </Button>)}
       </div>
       {devices.isError && <p role="alert" className="py-4 text-destructive">Impossible de charger les appareils.</p>}
@@ -76,6 +83,7 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState(d.app_name ?? "VCAMPRO");
   const [busy, setBusy] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   async function publish() {
     if (!file) return;
@@ -121,27 +129,40 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
   }
 
   return (
-    <li className="space-y-3 py-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")} · {d.product} · iOS {d.ios_version}{d.serial ? ` · Série ${d.serial}` : ""}</span>
+    <li className="py-4">
+      <div className="flex items-start gap-3">
+        <Smartphone className="mt-1 h-5 w-5 shrink-0 text-muted-foreground" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold">{d.product ?? "iPhone"}</span>
+            <span className="text-xs text-muted-foreground">{d.ios_version ? `iOS ${d.ios_version}` : ""}</span>
+            <Badge variant="outline">{d.reseller ? d.resellers?.name ?? "Revendeur supprimé" : "Mon site"}</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}{d.serial ? ` · Série ${d.serial}` : ""}</p>
         {d.ready_at && (() => { const end = warrantyEnd(new Date(d.ready_at), d.reseller ? RESELLER_WARRANTY_MONTHS : undefined); const expired = end.getTime() < Date.now(); return <span className={`font-mono text-xs ${expired ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}{expired ? " · EXPIRÉE" : ""}</span>; })()}
-        {d.reseller && <Badge variant="outline" className="border-primary text-primary">Revendeur{d.resellers?.name ? ` · ${d.resellers.name}` : ""}</Badge>}
-        <Badge variant={deviceStatus(d) === "installed" ? "default" : "outline"}>{filters.find((f) => f.value === deviceStatus(d))?.label}</Badge>
-        <Button size="icon" variant="ghost" className="ml-auto" asChild aria-label="Ouvrir la page client"><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>
+        </div>
+        <Button size="sm" variant="outline" aria-expanded={expanded} aria-controls={`device-${d.id}`} onClick={() => setExpanded(!expanded)}>Gérer <ChevronDown className={expanded ? "rotate-180" : ""} /></Button>
+      </div>
+      {expanded && <div id={`device-${d.id}`} className="mt-4 space-y-5 border-l-2 border-primary pl-4 sm:ml-8">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" variant="outline" asChild><a href={`/appareil/${d.token}`} target="_blank" rel="noreferrer"><ExternalLink /> Page client</a></Button>
         {d.cancelled_at && <Button size="sm" variant="outline" disabled={busy} onClick={changeCancellation}><RotateCcw /> Réactiver</Button>}
         <Button size="sm" variant="outline" className="text-destructive" disabled={busy} onClick={remove}><Ban /> {d.cancelled_at ? "Supprimer" : "Annuler et supprimer"}</Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-foreground">UDID</span>
         <span className="break-all font-mono text-sm">{d.udid}</span>
         <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(d.udid); toast.success("UDID copié"); }}><Copy /> Copier</Button>
       </div>
       {!d.cancelled_at && <>
-      <Input aria-label="Nom de l'application" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" />
+      <div className="space-y-2"><label htmlFor={`name-${d.id}`} className="text-xs text-muted-foreground">Nom de l'application</label>
+      <Input id={`name-${d.id}`} aria-label="Nom de l'application" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" /></div>
       <div className="flex flex-wrap items-center gap-2">
         <Input type="file" accept=".ipa" className="max-w-xs" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         <Button disabled={!file || busy} onClick={publish}><Upload /> {busy ? "Importation..." : "Publier l'IPA signé"}</Button>
       </div>
       </>}
+      </div>}
     </li>
   );
 }

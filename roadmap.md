@@ -33,3 +33,5 @@
 - [x] Device certification: /appareil captures UDID, owner panel lists devices and publishes signed IPA, client gets 1-click install. Real iPhone test pending after publish.
 - [x] Reseller panel with prepaid credits, QR/link certification (1 credit per device, 5-month warranty); owner manages resellers and credits in admin. Real iPhone scan pending.
 - [x] Credit purchase checkout shows its own item name "Crédits revendeur VCAMPRO" (own Stripe product/price, tax code set, both payment modes) instead of the access-code name; embedded checkout rendered and verified in preview.
+
+- [x] Simplify administrator navigation and device list with sidebar, one site/reseller selector, status counters and collapsed actions; verified with owner session on desktop/mobile without overflow or runtime errors, seven device-status tests passed. No publishing performed.

@@ -129,7 +129,7 @@ function Painel() {
 
   return (
     <main className="grid-paper min-h-screen">
-      <header className="cyber-header flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <header className="cyber-header flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <BrandLogo className="h-14 w-24 shrink-0 sm:h-16 sm:w-28" />
           <span className="hidden font-mono text-xs font-bold sm:block">TABLEAU DE BORD</span>
@@ -144,13 +144,14 @@ function Painel() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-4 pb-16">
-        <nav className="flex flex-wrap gap-2 border-b border-border py-5" aria-label="Sections du tableau de bord">
-          <Button variant={view === "devices" ? "brand" : "ghost"} aria-pressed={view === "devices"} onClick={() => setView("devices")}><Smartphone /> Appareils</Button>
-          <Button variant={view === "codes" ? "brand" : "ghost"} aria-pressed={view === "codes"} onClick={() => setView("codes")}><KeyRound /> Générateur de codes</Button>
-          <Button variant={view === "resellers" ? "brand" : "ghost"} aria-pressed={view === "resellers"} onClick={() => setView("resellers")}><Users /> Revendeurs</Button>
-          <Button variant={view === "settings" ? "brand" : "ghost"} aria-pressed={view === "settings"} onClick={() => setView("settings")}><Settings2 /> Affichage client</Button>
+      <div className="mx-auto grid max-w-7xl gap-0 px-4 pb-16 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
+        <nav className="grid grid-cols-2 content-start gap-2 border-b border-border py-5 lg:sticky lg:top-5 lg:h-fit lg:grid-cols-1 lg:border-b-0 lg:border-r lg:pr-5" aria-label="Sections du tableau de bord">
+          <Button className="justify-start whitespace-normal text-left" variant={view === "devices" ? "brand" : "ghost"} aria-pressed={view === "devices"} onClick={() => setView("devices")}><Smartphone /> Appareils</Button>
+          <Button className="justify-start whitespace-normal text-left" variant={view === "codes" ? "brand" : "ghost"} aria-pressed={view === "codes"} onClick={() => setView("codes")}><KeyRound /> Codes et fichiers</Button>
+          <Button className="justify-start whitespace-normal text-left" variant={view === "resellers" ? "brand" : "ghost"} aria-pressed={view === "resellers"} onClick={() => setView("resellers")}><Users /> Revendeurs</Button>
+          <Button className="justify-start whitespace-normal text-left" variant={view === "settings" ? "brand" : "ghost"} aria-pressed={view === "settings"} onClick={() => setView("settings")}><Settings2 /> Affichage client</Button>
         </nav>
+        <div className="min-w-0">
         {view === "devices" && <DevicesPanel />}
         {view === "settings" && <CustomerStepsPanel />}
         {view === "resellers" && <ResellersPanel />}
@@ -243,6 +244,7 @@ function Painel() {
           </div>
         </section>
       </div>
+        </div>
         </div>
       </div>
     </main>
