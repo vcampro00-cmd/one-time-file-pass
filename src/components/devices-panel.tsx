@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Ban, ChevronDown, Copy, ExternalLink, RotateCcw, Smartphone, Upload } from "lucide-react";
+import { Ban, ChevronDown, Copy, ExternalLink, Phone, RotateCcw, Smartphone, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { readIpaInfo } from "@/lib/ipa-info";
 import { RESELLER_WARRANTY_MONTHS, warrantyEnd } from "@/lib/warranty";
 import { deviceStatus, type DeviceStatus } from "@/lib/device-status";
+import { isValidCustomerPhone, normalizeCustomerPhone } from "@/lib/customer-phone";
 
-type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; installed_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; reseller_id: string | null; resellers: { name: string } | null };
+type Row = { id: string; token: string; udid: string; product: string | null; ios_version: string | null; serial: string | null; ready_at: string | null; installed_at: string | null; cancelled_at: string | null; app_name: string | null; created_at: string; reseller: boolean; reseller_id: string | null; customer_phone: string | null; resellers: { name: string } | null };
 
 const filters: { value: DeviceStatus; label: string }[] = [
   { value: "installed", label: "Prêts (installés)" },
@@ -27,7 +28,7 @@ export function DevicesPanel() {
   const devices = useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, installed_at, cancelled_at, app_name, created_at, reseller, reseller_id, resellers(name)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("devices").select("id, token, udid, product, ios_version, serial, ready_at, installed_at, cancelled_at, app_name, created_at, reseller, reseller_id, customer_phone, resellers(name)").order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as Row[];
     },
@@ -82,8 +83,21 @@ export function DevicesPanel() {
 function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState(d.app_name ?? "VCAMPRO");
+  const [phone, setPhone] = useState(d.customer_phone ?? "");
+  const [savingPhone, setSavingPhone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  async function savePhone() {
+    const value = normalizeCustomerPhone(phone);
+    if (value && !isValidCustomerPhone(value)) { toast.error("Numéro invalide : 8 à 15 chiffres."); return; }
+    setSavingPhone(true);
+    const { error } = await supabase.from("devices").update({ customer_phone: value || null }).eq("id", d.id).select("id").single();
+    setSavingPhone(false);
+    if (error) { toast.error("Impossible d'enregistrer le numéro"); return; }
+    toast.success("Numéro enregistré");
+    onChange();
+  }
 
   async function publish() {
     if (!file) return;
@@ -138,7 +152,7 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
             <span className="text-xs text-muted-foreground">{d.ios_version ? `iOS ${d.ios_version}` : ""}</span>
             <Badge variant="outline">{d.reseller ? d.resellers?.name ?? "Revendeur supprimé" : "Mon site"}</Badge>
           </div>
-          <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}{d.serial ? ` · Série ${d.serial}` : ""}</p>
+          <p className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleString("fr-FR")}{d.serial ? ` · Série ${d.serial}` : ""}{d.customer_phone ? ` · Tél. ${d.customer_phone}` : ""}</p>
         {d.ready_at && (() => { const end = warrantyEnd(new Date(d.ready_at), d.reseller ? RESELLER_WARRANTY_MONTHS : undefined); const expired = end.getTime() < Date.now(); return <span className={`font-mono text-xs ${expired ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Garantie jusqu'au {end.toLocaleDateString("fr-FR")}{expired ? " · EXPIRÉE" : ""}</span>; })()}
         </div>
         <Button size="sm" variant="outline" aria-expanded={expanded} aria-controls={`device-${d.id}`} onClick={() => setExpanded(!expanded)}>Gérer <ChevronDown className={expanded ? "rotate-180" : ""} /></Button>
@@ -154,6 +168,11 @@ function DeviceRow({ d, onChange }: { d: Row; onChange: () => void }) {
         <span className="break-all font-mono text-sm">{d.udid}</span>
         <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(d.udid); toast.success("UDID copié"); }}><Copy /> Copier</Button>
       </div>
+      <div className="space-y-2"><label htmlFor={`phone-${d.id}`} className="text-xs text-muted-foreground">Numéro de téléphone du client</label>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input id={`phone-${d.id}`} aria-label="Numéro de téléphone du client" inputMode="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+33 6 12 34 56 78" className="max-w-xs" />
+        <Button size="sm" variant="outline" disabled={savingPhone || phone === (d.customer_phone ?? "")} onClick={savePhone}><Phone /> {savingPhone ? "Enregistrement..." : "Enregistrer"}</Button>
+      </div></div>
       {!d.cancelled_at && <>
       <div className="space-y-2"><label htmlFor={`name-${d.id}`} className="text-xs text-muted-foreground">Nom de l'application</label>
       <Input id={`name-${d.id}`} aria-label="Nom de l'application" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom affiché" className="max-w-xs" /></div>

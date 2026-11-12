@@ -35,3 +35,5 @@
 - [x] Credit purchase checkout shows its own item name "Crédits revendeur VCAMPRO" (own Stripe product/price, tax code set, both payment modes) instead of the access-code name; embedded checkout rendered and verified in preview.
 
 - [x] Simplify administrator navigation and device list with sidebar, one site/reseller selector, status counters and collapsed actions; verified with owner session on desktop/mobile without overflow or runtime errors, seven device-status tests passed. No publishing performed.
+
+- [x] Record the client's phone number per device in the owner panel (new customer_phone column, shared validation rules, saved from the device row and shown in its summary line); 61 tests passed and save/reload/restore verified with the owner session on desktop without console errors. No publishing performed.

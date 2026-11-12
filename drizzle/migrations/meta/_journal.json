@@ -99,6 +99,13 @@
       "when": 1794332351384,
       "tag": "0013_device_purchase_followup",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794494219432,
+      "tag": "0014_device_customer_phone",
+      "breakpoints": true
     }
   ]
 }
